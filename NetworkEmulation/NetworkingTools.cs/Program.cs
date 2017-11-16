@@ -15,13 +15,13 @@ namespace NetworkingTools.cs
         public static void Main(string[] args)
         {
             Program P = new Program();
-            P.runUnitTests();
+            P.runTests();
         }
 
-        public void runUnitTests()
+        public void runTests()
         {
             NetworkingToolsTester NTT = new NetworkingToolsTester();
-            NTT.packageConstructorTest1();
+            NTT.packageToByteArrayTest();
             Console.ReadKey();
         }
     }
