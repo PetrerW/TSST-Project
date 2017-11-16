@@ -16,3 +16,12 @@ C:\Users\Damian\Desktop\TSST nasz\NetworkEmulation\ClientNode\obj\Debug\ClientNo
 C:\Users\Damian\Desktop\TSST nasz\NetworkEmulation\ClientNode\obj\Debug\ClientNode.Form1.resources
 C:\Users\Damian\Desktop\TSST nasz\NetworkEmulation\ClientNode\obj\Debug\ClientNode.Properties.Resources.resources
 C:\Users\Damian\Desktop\TSST nasz\NetworkEmulation\ClientNode\obj\Debug\ClientNode.csproj.GenerateResource.Cache
+E:\Piotr\Programowanie\C#\TSST-Project.git\branches\Piotrek\NetworkEmulation\ClientNode\bin\Debug\ClientNode.exe.config
+E:\Piotr\Programowanie\C#\TSST-Project.git\branches\Piotrek\NetworkEmulation\ClientNode\obj\Debug\ClientNode.exe
+E:\Piotr\Programowanie\C#\TSST-Project.git\branches\Piotrek\NetworkEmulation\ClientNode\obj\Debug\ClientNode.pdb
+E:\Piotr\Programowanie\C#\TSST-Project.git\branches\Piotrek\NetworkEmulation\ClientNode\bin\Debug\ClientNode.exe
+E:\Piotr\Programowanie\C#\TSST-Project.git\branches\Piotrek\NetworkEmulation\ClientNode\bin\Debug\ClientNode.pdb
+E:\Piotr\Programowanie\C#\TSST-Project.git\branches\Piotrek\NetworkEmulation\ClientNode\obj\Debug\ClientNode.csprojResolveAssemblyReference.cache
+E:\Piotr\Programowanie\C#\TSST-Project.git\branches\Piotrek\NetworkEmulation\ClientNode\obj\Debug\ClientNode.Form1.resources
+E:\Piotr\Programowanie\C#\TSST-Project.git\branches\Piotrek\NetworkEmulation\ClientNode\obj\Debug\ClientNode.Properties.Resources.resources
+E:\Piotr\Programowanie\C#\TSST-Project.git\branches\Piotrek\NetworkEmulation\ClientNode\obj\Debug\ClientNode.csproj.GenerateResource.Cache

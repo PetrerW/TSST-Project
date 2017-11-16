@@ -6,3 +6,11 @@ C:\Users\Damian\Desktop\TSST nasz\NetworkEmulation\Test\bin\Debug\ClientNode.exe
 C:\Users\Damian\Desktop\TSST nasz\NetworkEmulation\Test\bin\Debug\ClientNode.pdb
 C:\Users\Damian\Desktop\TSST nasz\NetworkEmulation\Test\obj\Debug\Test.exe
 C:\Users\Damian\Desktop\TSST nasz\NetworkEmulation\Test\obj\Debug\Test.pdb
+E:\Piotr\Programowanie\C#\TSST-Project.git\branches\Piotrek\NetworkEmulation\Test\bin\Debug\Test.exe.config
+E:\Piotr\Programowanie\C#\TSST-Project.git\branches\Piotrek\NetworkEmulation\Test\bin\Debug\Test.exe
+E:\Piotr\Programowanie\C#\TSST-Project.git\branches\Piotrek\NetworkEmulation\Test\bin\Debug\Test.pdb
+E:\Piotr\Programowanie\C#\TSST-Project.git\branches\Piotrek\NetworkEmulation\Test\bin\Debug\ClientNode.exe
+E:\Piotr\Programowanie\C#\TSST-Project.git\branches\Piotrek\NetworkEmulation\Test\bin\Debug\ClientNode.pdb
+E:\Piotr\Programowanie\C#\TSST-Project.git\branches\Piotrek\NetworkEmulation\Test\obj\Debug\Test.csprojResolveAssemblyReference.cache
+E:\Piotr\Programowanie\C#\TSST-Project.git\branches\Piotrek\NetworkEmulation\Test\obj\Debug\Test.exe
+E:\Piotr\Programowanie\C#\TSST-Project.git\branches\Piotrek\NetworkEmulation\Test\obj\Debug\Test.pdb
