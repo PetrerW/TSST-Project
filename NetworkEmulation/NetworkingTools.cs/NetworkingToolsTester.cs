@@ -176,6 +176,26 @@ namespace NetworkingTools.cs
             //czy adres IP to domyslnie ustawiony 127.0.0.1?
             Assert.AreEqual(Package.exctractSourceIP(bytes), IP);
         }
+
+        /// <summary>
+        /// Testuje wycinanie wiadomosci z tablicy bajtow.
+        /// </summary>
+        [TestMethod]
+        public void extractUsableMessageTest()
+        {
+            string inscription = "nowa, zmieniona wiadomosc";
+            Package P = new Package();
+
+            //zamien wiadomosc na tablice bajtow
+            byte[] bytes = Encoding.ASCII.GetBytes(inscription);
+
+            //zmienienie wiadomosci w postaci bajtow w pakiecie
+            P.changeMessage(bytes);
+
+            Assert.AreEqual(inscription, P.usableMessage);
+
+            Assert.AreEqual(bytes, P.usableInfoBytes.ToArray());
+        }
     }
 
 }
