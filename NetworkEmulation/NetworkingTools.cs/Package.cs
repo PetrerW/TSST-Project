@@ -42,7 +42,7 @@ namespace NetworkingTools.cs
         public short usableInfoMaxLength { get; }
 
         //Dlugosc naglowka, [B]. 24
-        public short headerLength { get; }
+        public short headerMaxLength { get; }
 
         //numer portu, 2B
         public short portNumber;
@@ -82,7 +82,7 @@ namespace NetworkingTools.cs
         public Package()
         {
             usableInfoMaxLength = 40;
-            headerLength = 24;
+            headerMaxLength = 24;
 
             //domyslny numer portu
             portNumber = 1;
@@ -122,7 +122,7 @@ namespace NetworkingTools.cs
             this.usableMessage = usableMessage;
 
             //Aktualizacja wartosci tablic z bajtami
-            this.toBytes();
+            actualizeBytes();
         }
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace NetworkingTools.cs
         /// <param name="port"></param>
         /// <param name="IP_Source"></param>
         /// <param name="IP_Destination"></param>
-        public Package(string usableMessage, short port, string IP_Source, string IP_Destination) : this()
+        public Package(string usableMessage, short port, string IP_Destination, string IP_Source) : this()
         {
             this.usableMessage = usableMessage;
             this.portNumber = port;
@@ -140,7 +140,34 @@ namespace NetworkingTools.cs
             this.IP_Destination = IPAddress.Parse(IP_Destination);
 
             //Aktualizacja wartosci tablic z bajtami
-            this.toBytes();
+            actualizeBytes();
+        }
+
+        /// <summary>
+        /// Konstruktor ze wszystkimi parametrami z naglowka i wiadomoscia.
+        /// </summary>
+        /// <param name="usableMessage"></param>
+        /// <param name="port"></param>
+        /// <param name="IP_Source"></param>
+        /// <param name="IP_Destination"></param>
+        /// <param name="packageNumber"></param>
+        /// <param name="frequency"></param>
+        /// <param name="band"></param>
+        /// <param name="usableInfoLength"></param>
+        public Package(string usableMessage, short port, string IP_Destination, string IP_Source, short packageNumber,
+            short frequency, short band, short usableInfoLength) : this()
+        {
+            this.usableMessage = usableMessage;
+            this.portNumber = port;
+            this.IP_Source = IPAddress.Parse(IP_Source);
+            this.IP_Destination = IPAddress.Parse(IP_Destination);
+            this.packageNumber = packageNumber;
+            this.frequency = frequency;
+            this.band = band;
+            this.usableInfoLength = usableInfoLength;
+
+            //Aktualizacja wartosci tablic z bajtami
+            actualizeBytes();
         }
 
         /// <summary>
@@ -148,6 +175,20 @@ namespace NetworkingTools.cs
         /// </summary>
         /// <returns>byte[]</returns>
         public byte[] toBytes()
+        {
+            //zaktualizuj zawartosc list z bajtami
+            actualizeBytes();
+
+            var bytesList = new List<byte>(headerBytes);
+            bytesList.AddRange(usableInfoBytes);
+
+            return bytesList.ToArray();
+        }
+
+        /// <summary>
+        /// Aktualizuje listy bajtow po zmianie jakiegos pola w obiekcie klasy Package.
+        /// </summary>
+        public void actualizeBytes()
         {
             //zapisanie nru portu w postaci tablicy bajtow
             byte[] portNumber_bytes = BitConverter.GetBytes(portNumber);
@@ -177,30 +218,29 @@ namespace NetworkingTools.cs
 
             this.headerBytes = new List<byte>();
 
-
-            //Dodanie portu i adresow w postaci bajtow do listy bajtow
+            //Dodanie wszystkich pol w kolejnosci, w postaci bajtow, do listy bajtow
             headerBytes.AddRange(portNumber_bytes);
             headerBytes.AddRange(IP_Destination_bytes);
             headerBytes.AddRange(IP_Source_bytes);
+            headerBytes.AddRange(packageNumberBytes);
+            headerBytes.AddRange(frequencyBytes);
+            headerBytes.AddRange(bandBytes);
+            headerBytes.AddRange(usableInfoLengthBytes);
 
             //wypelnienie jej zerami
-            headerBytes = fillBytesWIth0(headerLength, headerBytes);
+            headerBytes = fillBytesWIth0(headerMaxLength, headerBytes);
 
             //jak nie jest nullem, to trzeba to wyzerowac
             if (usableInfoBytes != null)
                 usableInfoBytes = null;
 
             this.usableInfoBytes = new List<byte>();
+
             //dodanie wiadomosci do listy
             usableInfoBytes.AddRange(Encoding.ASCII.GetBytes(usableMessage));
 
             //uzupełnienie zerami
             usableInfoBytes = this.fillBytesWIth0(usableInfoMaxLength, usableInfoBytes);
-
-            var bytesList = new List<byte>(headerBytes);
-            bytesList.AddRange(usableInfoBytes);
-
-            return bytesList.ToArray();
         }
 
         /// <summary>
@@ -231,7 +271,7 @@ namespace NetworkingTools.cs
         /// </summary>
         /// <param name="packageBytes"> Pakiet w postaci bajtów.</param>
         /// <returns>Nr portu z pakietu.</returns>
-        public static short exctractPort(byte[] packageBytes)
+        public static short extractPortNumber(byte[] packageBytes)
         {
             //Nr portu sie zaczyna od indeksu 0 i ma dlugosc 2
             byte[] bytes = Package.extract(0, 2, packageBytes);
@@ -360,56 +400,46 @@ namespace NetworkingTools.cs
             return BitConverter.ToString(bytes);
         }
 
-
         /// <summary>
         /// Zmienia wartosc wiadomosci pakietu i podmienia ja w tablicy bajtow. UWAGA: Uzupelnia ja zerami!
-        /// Nalezy podac tablice bajtow bez zer na koncu!
+        /// Nalezy podac tablice bajtow BEZ zer na koncu!
         /// </summary>
         /// <param name="usableMessageBytes"></param>
-        [Obsolete]
         public void changeMessage(byte[] usableMessageBytes)
         {
-            //zerowanie listy bajtow z poprzednia wiadomoscia
-            this.usableInfoBytes = null;
-            this.usableInfoBytes = new List<byte>();
-
-            //dodanie do (pustej) listy bajtow bajtow wiadomosci
-            this.usableInfoBytes.AddRange(usableMessageBytes);
 
             //Jak tablica bajtow jest za duza, to rzuc wyjatek
-            if(usableMessageBytes.Length > usableInfoMaxLength)
-                throw new Exception("Dlugosc podanej tablicy bajtow jest wieksza, niz " + usableInfoMaxLength + " bajtow!");
-            
-            //ustawienie wiadomosci uzytkowej
+            if (usableMessageBytes.Length > usableInfoMaxLength)
+                throw new Exception("Package.changeMessage(byte[]): Dlugosc podanej tablicy bajtow jest wieksza, niz " + usableInfoMaxLength + " bajtow!");
+
+            //wpisanie pola z wiadomoscia
             this.usableMessage = Encoding.ASCII.GetString(usableMessageBytes);
 
-            //
-            this.usableInfoLength = (short)usableMessageBytes.Length;
+            //przypisanie dlugosci wiadomosci
+            this.usableInfoLength = (short)this.usableMessage.Length;
 
-            //uzupelnij zerowymi bajtami
-            this.usableInfoBytes = fillBytesWIth0(usableInfoMaxLength, usableInfoBytes);
-
-            //aktualizacja - potrzebna?
-            this.toBytes();
+            //aktualizacja z wpisanych pol
+            this.actualizeBytes();
         }
 
+        /// <summary>
+        /// Zmienia wartosc wiadomosci uzytkowej i odpowiednie bajty
+        /// </summary>
+        /// <param name="message"></param>
         public void changeMessage(string message)
         {
-            this.usableMessage = message;
-
-            //wyzerowanie starej listy z bajtami i stworzenie nowej
-            this.usableInfoBytes = null;
-            this.usableInfoBytes = new List<byte>();
-
-            //dodanie do (pustej) listy bajtow bajtow wiadomosci
-            this.usableInfoBytes.AddRange(Encoding.ASCII.GetBytes(usableMessage));
-
             //Jak tablica bajtow jest za duza, to rzuc wyjatek
             if (message.Length > usableInfoMaxLength)
-                throw new Exception("Dlugosc podanego stringa bajtow jest wieksza, niz " + usableInfoMaxLength + " bajtow!");
+                throw new Exception("Package.changeMessage(string): Dlugosc podanego stringa bajtow jest wieksza, niz " + usableInfoMaxLength + " bajtow!");
 
-            //uzupelnij zerowymi bajtami
-            this.usableInfoBytes = fillBytesWIth0(usableInfoMaxLength, usableInfoBytes);
+            //przypisanie wiadomosci
+            this.usableMessage = message;
+
+            //przypisanie dlugosci wiadomosci
+            this.usableInfoLength = (short)message.Length;
+
+            //aktualizacja z gotowych wpisanych pol
+            this.actualizeBytes();
         }
     }
 }
