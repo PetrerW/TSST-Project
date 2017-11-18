@@ -21,7 +21,7 @@ namespace NetworkingTools.cs
         public void runTests()
         {
             NetworkingToolsTester NTT = new NetworkingToolsTester();
-            NTT.packageToByteArrayTest();
+            NTT.testChangeMessageString();
             Console.ReadKey();
         }
     }
