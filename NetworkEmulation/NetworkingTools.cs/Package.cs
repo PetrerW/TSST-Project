@@ -27,8 +27,11 @@ namespace NetworkingTools.cs
     /// Nr czestotliwosci - 2B od 12 do 13, short. nr = x => czestotliwosc = 193 000 GHz + x  * 12.5 GHz
     /// Pasmo - 2B od 14 do 15, short. Pasmo = 5 => pasmo = 12.5*5 [GHz]
     /// Dlugosc informacji uzytkowej - 2B od 16 do 17, short
-    /// 6B od 18 do 23 - zarezerwowane na ewentualne przyszle rzeczy. Np. nr pakietu, gdy dzielimy pakiet 
-    /// Informacja uzyteczna (domyslnie):
+    /// Wydajnosc modulacji, N. Ile bitow koduje jeden symbol - 2B od 18 do 19, short
+    /// Z jaka predkowscia bitowa leci ten pakiet - 2B od 20 do 21, short
+    /// Identyfikator pakietu, 2B od 22 do 23, short
+    /// 
+    /// Informacja uzytkowa (domyslnie):
     /// Tekst + 
     /// timestamp. 
     /// 
@@ -65,7 +68,14 @@ namespace NetworkingTools.cs
         //Wlasciwa dlugosc informacji uzytkowej, bez wypelnienia zerowymi bajtami
         public short usableInfoLength { get; set; }
 
-        //6B zarezerwowane dodatkowo na przyszłe ficzery drugiego etapu
+        //Wydajnosc modulacji, N. Ile bitow koduje jeden symbol
+        public short modulationPerformance { get; set; }
+
+        //Z jaka predkowscia bitowa leci ten pakiet. Rzeczywista predkosc = bitRate*12.5Gb/s
+        public short bitRate { get; set; }
+
+        //Identyfikator pakietu
+        public short ID { get; set; }
 
         //40-bajtowe pole z wiadomością użytkową
         public List<byte> usableInfoBytes { get; set; }
@@ -102,6 +112,15 @@ namespace NetworkingTools.cs
             //12.5GHz
             band = 1;
 
+            //Jeden symbol koduje 1 bit
+            modulationPerformance = 1;
+
+            //predkosc bitowa, z jaka leci pakiet n*12.5Gb/s
+            bitRate = 1;
+
+            //losowanie ID
+            ID = (short)(new Random()).Next(0, short.MaxValue);
+
             //Ala ma kota  + czas danego dnia w milisekundach
             usableMessage =
                 "Ala ma kora, a kor nie ma lai" + DateTime.Now.Date.TimeOfDay.TotalMilliseconds.ToString();
@@ -120,6 +139,7 @@ namespace NetworkingTools.cs
         public Package(string usableMessage) : this()
         {
             this.usableMessage = usableMessage;
+            this.usableInfoLength = (short) usableMessage.Length;
 
             //Aktualizacja wartosci tablic z bajtami
             actualizeBytes();
@@ -138,6 +158,7 @@ namespace NetworkingTools.cs
             this.portNumber = port;
             this.IP_Source = IPAddress.Parse(IP_Source);
             this.IP_Destination = IPAddress.Parse(IP_Destination);
+            this.usableInfoLength = (short) usableMessage.Length;
 
             //Aktualizacja wartosci tablic z bajtami
             actualizeBytes();
@@ -155,7 +176,7 @@ namespace NetworkingTools.cs
         /// <param name="band"></param>
         /// <param name="usableInfoLength"></param>
         public Package(string usableMessage, short port, string IP_Destination, string IP_Source, short packageNumber,
-            short frequency, short band, short usableInfoLength) : this()
+            short frequency, short band) : this()
         {
             this.usableMessage = usableMessage;
             this.portNumber = port;
@@ -164,9 +185,28 @@ namespace NetworkingTools.cs
             this.packageNumber = packageNumber;
             this.frequency = frequency;
             this.band = band;
-            this.usableInfoLength = usableInfoLength;
+            this.usableInfoLength = (short)this.usableMessage.Length;
 
             //Aktualizacja wartosci tablic z bajtami
+            actualizeBytes();
+        }
+
+        public Package(string usableMessage, short port, string IP_Destination, string IP_Source, short packageNumber,
+            short frequency, short band, short modulationPerformance, short bitRate, short ID) : this()
+        {
+            this.usableMessage = usableMessage;
+            this.portNumber = port;
+            this.IP_Source = IPAddress.Parse(IP_Source);
+            this.IP_Destination = IPAddress.Parse(IP_Destination);
+            this.packageNumber = packageNumber;
+            this.frequency = frequency;
+            this.band = band;
+            this.usableInfoLength = (short)this.usableMessage.Length;
+            this.modulationPerformance = modulationPerformance;
+            this.bitRate = bitRate;
+            this.ID = ID;
+
+            //aktualizacja tablic z bajtami
             actualizeBytes();
         }
 
@@ -211,6 +251,15 @@ namespace NetworkingTools.cs
             //zamiana dlugosci informacji uzytkowej na bajty
             byte[] usableInfoLengthBytes = BitConverter.GetBytes(usableInfoLength);
 
+            //zmiana wydajnosci modulacji na bajty
+            byte[] modulationPerformanceBytes = BitConverter.GetBytes(modulationPerformance);
+
+            //zmiana predkosci bitowej na bajty
+            byte[] bitRateBytes = BitConverter.GetBytes(bitRate);
+
+            //zmiana ID na bajty
+            byte[] IDBytes = BitConverter.GetBytes(ID);
+
             //jak headerBytes jest juz jakis niezerowy
             if (this.headerBytes != null)
                 //to trzeba go wyzerowac
@@ -226,6 +275,9 @@ namespace NetworkingTools.cs
             headerBytes.AddRange(frequencyBytes);
             headerBytes.AddRange(bandBytes);
             headerBytes.AddRange(usableInfoLengthBytes);
+            headerBytes.AddRange(modulationPerformanceBytes);
+            headerBytes.AddRange(bitRateBytes);
+            headerBytes.AddRange(IDBytes);
 
             //wypelnienie jej zerami
             headerBytes = fillBytesWIth0(headerMaxLength, headerBytes);
@@ -240,7 +292,7 @@ namespace NetworkingTools.cs
             usableInfoBytes.AddRange(Encoding.ASCII.GetBytes(usableMessage));
 
             //uzupełnienie zerami
-            usableInfoBytes = this.fillBytesWIth0(usableInfoMaxLength, usableInfoBytes);
+            usableInfoBytes = fillBytesWIth0(usableInfoMaxLength, usableInfoBytes);
         }
 
         /// <summary>
@@ -249,7 +301,7 @@ namespace NetworkingTools.cs
         /// <param name="maxLength"></param>
         /// <param name="bytes"></param>
         /// <returns></returns>
-        public List<byte> fillBytesWIth0(int maxLength, List<byte> bytes)
+        public static List<byte> fillBytesWIth0(int maxLength, List<byte> bytes)
         {
             if (bytes.Count > maxLength)
             {
@@ -257,9 +309,13 @@ namespace NetworkingTools.cs
                 //zwroce bytes, bo jak przyrownamy do outputu funkcji to bytes sie nie zmieni
                 return bytes;
             }
+            //Nie ma czego wypelniac zerami
+            else if (bytes.Count == maxLength)
+                return bytes;
+
             for (int i = bytes.Count; i < maxLength; i++)
             {
-                //dodaję 0000 0000, aż rozmiar listy byteów urośnie do 40
+                //dodaję 0000 0000, aż rozmiar listy byteów urośnie do maksymalnej dlugosci pola
                 bytes.Add(0x00);
             }
 
@@ -364,7 +420,7 @@ namespace NetworkingTools.cs
         /// <returns></returns>
         public static short extractBand(byte[] packageBytes)
         {
-            //czestotliwosc jest od 12 do 13 w tablicy
+            //pasmo jest od 14 do 15 w tablicy
             byte[] bytes = Package.extract(14, 2, packageBytes);
 
             //konwertuje bajty na shorta, 0 to indeks mowiacy, skad zaczac w tablicy
@@ -379,8 +435,50 @@ namespace NetworkingTools.cs
         /// <returns></returns>
         public static short extractUsableInfoLength(byte[] packageBytes)
         {
-            //czestotliwosc jest od 12 do 13 w tablicy
+            //dlugosc informacji uzytkowej jest od 16 do 17 w tablicy
             byte[] bytes = Package.extract(16, 2, packageBytes);
+
+            //konwertuje bajty na shorta, 0 to indeks mowiacy, skad zaczac w tablicy
+            return BitConverter.ToInt16(bytes, 0);
+        }
+
+        /// <summary>
+        /// Wycina z tablicy bajtow i konwertuje na shorta wydajnosc modulacji.
+        /// </summary>
+        /// <param name="packageBytes"></param>
+        /// <returns></returns>
+        public static short extractModulationPerformance(byte[] packageBytes)
+        {
+            //wydajnosc modulacji jest od 18 do 19 w tablicy
+            byte[] bytes = Package.extract(18, 2, packageBytes);
+
+            //konwertuje bajty na shorta, 0 to indeks mowiacy, skad zaczac w tablicy
+            return BitConverter.ToInt16(bytes, 0);
+        }
+
+        /// <summary>
+        /// Wycina z tablicy bajtow i konwertuje na shorta predkosc bitowa z jaka leci pakiet.
+        /// </summary>
+        /// <param name="packageBytes"></param>
+        /// <returns></returns>
+        public static short extractBitRate(byte[] packageBytes)
+        {
+            //wydajnosc modulacji jest od 20 do 21 w tablicy
+            byte[] bytes = Package.extract(20, 2, packageBytes);
+
+            //konwertuje bajty na shorta, 0 to indeks mowiacy, skad zaczac w tablicy
+            return BitConverter.ToInt16(bytes, 0);
+        }
+
+        /// <summary>
+        /// Wycina z tablicy bajtow i konwertuje na shorta ID pakietu.
+        /// </summary>
+        /// <param name="packageBytes"></param>
+        /// <returns></returns>
+        public static short extractID(byte[] packageBytes)
+        {
+            //wydajnosc modulacji jest od 22 do 23 w tablicy
+            byte[] bytes = Package.extract(22, 2, packageBytes);
 
             //konwertuje bajty na shorta, 0 to indeks mowiacy, skad zaczac w tablicy
             return BitConverter.ToInt16(bytes, 0);
@@ -397,7 +495,7 @@ namespace NetworkingTools.cs
             //Wiadomosc uzytkowa jest od 24. indeksu i ma dlugosc 40
             byte[] bytes = Package.extract(24, usableInfoLength, packageBytes);
 
-            return BitConverter.ToString(bytes);
+            return Encoding.ASCII.GetString(bytes);
         }
 
         /// <summary>
@@ -439,6 +537,107 @@ namespace NetworkingTools.cs
             this.usableInfoLength = (short)message.Length;
 
             //aktualizacja z gotowych wpisanych pol
+            this.actualizeBytes();
+        }
+
+
+        /// <summary>
+        /// Zmienia i aktualizuje w tablicy bajtow wartosc pola port.
+        /// </summary>
+        /// <param name="port"></param>
+        public void changePort(short port)
+        {
+            this.portNumber = port;
+            this.actualizeBytes();
+        }
+
+        /// <summary>
+        /// Zmienia i aktualizuje w tablicy bajtow wartosc pola IP_Source.
+        /// </summary>
+        /// <param name="IP"></param>
+        public void changeSourceIP(string IP)
+        {
+            this.IP_Source = IPAddress.Parse(IP);
+            this.actualizeBytes();
+        }
+
+        /// <summary>
+        /// Zmienia i aktualizuje w tablicy bajtow wartosc pola IP_Destination.
+        /// </summary>
+        /// <param name="IP"></param>
+        public void changeDestinationIP(string IP)
+        {
+            this.IP_Destination = IPAddress.Parse(IP);
+            this.actualizeBytes();
+        }
+
+        /// <summary>
+        /// Zmienia i aktualizuje w tablicy bajtow wartosc pola packageNumber.
+        /// </summary>
+        /// <param name="number"></param>
+        public void changePackageNumber(short number)
+        {
+            this.packageNumber = number;
+            this.actualizeBytes();
+        }
+
+        /// <summary>
+        /// Zmienia i aktualizuje w tablicy bajtow wartosc pola frequency.
+        /// </summary>
+        /// <param name="frequency"></param>
+        public void changeFrequency(short frequency)
+        {
+            this.frequency = frequency;
+            this.actualizeBytes();
+        }
+
+        /// <summary>
+        /// Zmienia i aktualizuje w tablicy bajtow wartosc pola band.
+        /// </summary>
+        /// <param name="band"></param>
+        public void changeBand(short band)
+        {
+            this.band = band;
+            this.actualizeBytes();
+        }
+
+        /// <summary>
+        /// Zmienia i aktualizuje w tablicy bajtow wartosc pola usableInfoLength.
+        /// </summary>
+        /// <param name="length"></param>
+        public void changeUsableInfoLength(short length)
+        {
+            this.usableInfoLength = length;
+            this.actualizeBytes();
+        }
+
+        /// <summary>
+        /// Zmienia i aktualizuje w tablicy bajtow wartosc pola modulationPerformance.
+        /// </summary>
+        /// <param name="performance"></param>
+        public void changeModulationPerformance(short performance)
+        {
+            this.modulationPerformance = performance;
+            this.actualizeBytes();
+        }
+
+        /// <summary>
+        /// Zmienia i aktualizuje w tablicy bajtow wartosc pola bitRate.
+        /// </summary>
+        /// <param name="bitRate"></param>
+        public void changeBitRate(short bitRate)
+        {
+            this.bitRate = bitRate;
+            this.actualizeBytes();
+        }
+
+        /// <summary>
+        /// Zmienia i aktualizuje w tablicy bajtow wartosc pola ID.
+        /// </summary>
+        /// <param name="ID"></param>
+        public void changeID(short ID)
+        {
+            this.ID = ID;
             this.actualizeBytes();
         }
     }

@@ -130,8 +130,11 @@ namespace NetworkingTools.cs
             short frequency = 2;
             short band = 4;
             short usableInfoLength = (short)inscription.Length;
+            short modulationPerformance = 1;
+            short bitRate = 7;
+            short ID = 17;
 
-            Package P = new Package(inscription, portNumber, IP_Destination.ToString(), IP_Source.ToString(), packageNumber, frequency, band, usableInfoLength);
+            Package P = new Package(inscription, portNumber, IP_Destination.ToString(), IP_Source.ToString(), packageNumber, frequency, band, modulationPerformance, bitRate, ID);
 
             //Czy pola sie dobrze wpisaly?
             Assert.AreEqual(inscription, P.usableMessage);
@@ -141,6 +144,9 @@ namespace NetworkingTools.cs
             Assert.AreEqual(packageNumber, P.packageNumber);
             Assert.AreEqual(band, P.band);
             Assert.AreEqual(usableInfoLength, P.usableInfoLength);
+            Assert.AreEqual(modulationPerformance, P.modulationPerformance);
+            Assert.AreEqual(bitRate, P.bitRate);
+            Assert.AreEqual(ID, P.ID);
 
             //zamiana na tablice bajtow pol
             byte[] inscriptionBytes = Encoding.ASCII.GetBytes(inscription);
@@ -151,6 +157,9 @@ namespace NetworkingTools.cs
             byte[] frequencyBytes = BitConverter.GetBytes(frequency);
             byte[] bandBytes = BitConverter.GetBytes(band);
             byte[] usableInfoLengthBytes = BitConverter.GetBytes(usableInfoLength);
+            byte[] modulationPerformanceBytes = BitConverter.GetBytes(modulationPerformance);
+            byte[] bitRateBytes = BitConverter.GetBytes(bitRate);
+            byte[] IDBytes = BitConverter.GetBytes(ID);
 
             //stworzenie listy bajtow z naglowkiem, takiej jak w klasie package
             var headerBytes = new List<byte>();
@@ -161,16 +170,19 @@ namespace NetworkingTools.cs
             headerBytes.AddRange(frequencyBytes);
             headerBytes.AddRange(bandBytes);
             headerBytes.AddRange(usableInfoLengthBytes);
+            headerBytes.AddRange(modulationPerformanceBytes);
+            headerBytes.AddRange(bitRateBytes);
+            headerBytes.AddRange(IDBytes);
 
             //wypelnienie jej zerami
-            headerBytes = P.fillBytesWIth0(P.headerMaxLength, headerBytes);
+            headerBytes = Package.fillBytesWIth0(P.headerMaxLength, headerBytes);
 
             //stworzenie listy bajtow z wiadomoscia
             var usableInfoBytes = new List<byte>();
             usableInfoBytes.AddRange(inscriptionBytes);
 
             //wypelnienie jej zerami
-            usableInfoBytes = P.fillBytesWIth0(P.usableInfoMaxLength, usableInfoBytes);
+            usableInfoBytes = Package.fillBytesWIth0(P.usableInfoMaxLength, usableInfoBytes);
 
             //sprawdzenie, czy bajty sa takie same
             Assert.IsTrue(usableInfoBytes.SequenceEqual(P.usableInfoBytes));
@@ -256,13 +268,16 @@ namespace NetworkingTools.cs
 
             Assert.AreEqual(inscription, P.usableMessage);
 
-            bytes = P.fillBytesWIth0(P.usableInfoMaxLength, new List<byte>(bytes)).ToArray();
+            bytes = Package.fillBytesWIth0(P.usableInfoMaxLength, new List<byte>(bytes)).ToArray();
 
             //czy tablica bajtow liczy tyle samo
             Assert.AreEqual(bytes.Length, P.usableInfoBytes.Count);
 
             //czy bajty sa takie same
             Assert.IsTrue(bytes.SequenceEqual(P.usableInfoBytes));
+
+            //
+            Assert.AreEqual(inscription, Package.extractUsableMessage(P.toBytes(), (short)inscription.Length));
         }
 
         /// <summary>
@@ -278,7 +293,7 @@ namespace NetworkingTools.cs
             byte[] messageLengthBytes = BitConverter.GetBytes(messageLength);
             byte[] messageBytes = Encoding.ASCII.GetBytes(message);
 
-            var messageBytesList = P.fillBytesWIth0(P.usableInfoMaxLength, messageBytes.ToList());
+            var messageBytesList = Package.fillBytesWIth0(P.usableInfoMaxLength, messageBytes.ToList());
 
             //zmiana wiadomosci
             P.changeMessage(message);
@@ -312,7 +327,7 @@ namespace NetworkingTools.cs
             byte[] messageLengthBytes = BitConverter.GetBytes(messageLength);
             byte[] messageBytes = Encoding.ASCII.GetBytes(message);
 
-            var messageBytesList = P.fillBytesWIth0(P.usableInfoMaxLength, messageBytes.ToList());
+            var messageBytesList = Package.fillBytesWIth0(P.usableInfoMaxLength, messageBytes.ToList());
 
             //zmiana tablicy bajtow z wiadomoscia i zerami 
             P.changeMessage(messageBytes);
@@ -333,6 +348,82 @@ namespace NetworkingTools.cs
             Assert.IsTrue(messageBytesList.SequenceEqual(P.usableInfoBytes));
         }
 
-    }
+        [TestMethod]
+        public void testChangeParam()
+        {
+            string inscription = "Mam malo wody";
+            short portNumber = 10;
+            IPAddress IP_Source = IPAddress.Parse("127.0.0.1");
+            IPAddress IP_Destination = IPAddress.Parse("127.0.0.2");
+            short packageNumber = 5;
+            short frequency = 2;
+            short band = 4;
+            short usableInfoLength = (short)inscription.Length;
+            short modulationPerformance = 11;
+            short bitRate = 7;
+            short ID = 17;
 
+            //zamiana na tablice bajtow pol
+            byte[] inscriptionBytes = Encoding.ASCII.GetBytes(inscription);
+            byte[] portNumberBytes = BitConverter.GetBytes(portNumber);
+            byte[] IP_DestinationBytes = IP_Destination.GetAddressBytes();
+            byte[] IP_SourceBytes = IP_Source.GetAddressBytes();
+            byte[] packageNumberBytes = BitConverter.GetBytes(packageNumber);
+            byte[] frequencyBytes = BitConverter.GetBytes(frequency);
+            byte[] bandBytes = BitConverter.GetBytes(band);
+            byte[] usableInfoLengthBytes = BitConverter.GetBytes(usableInfoLength);
+            byte[] modulationPerformanceBytes = BitConverter.GetBytes(modulationPerformance);
+            byte[] bitRateBytes = BitConverter.GetBytes(bitRate);
+            byte[] IDBytes = BitConverter.GetBytes(ID);
+
+            Package P = new Package();
+
+            //zmiana pola
+            P.changeMessage(inscription);
+            //czy sie dobrze wpisalo
+            Assert.AreEqual(inscription, P.usableMessage);
+            //czy bajty dobrze przypisalo
+            Assert.IsTrue(inscriptionBytes.SequenceEqual(Package.extract(24, (short) inscription.Length, P.toBytes())));
+
+            P.changePort(portNumber);
+            Assert.AreEqual(portNumber, P.portNumber);
+            Assert.IsTrue(portNumberBytes.SequenceEqual(Package.extract(0, 2, P.toBytes())));
+
+            P.changeDestinationIP(IP_Destination.ToString());
+            Assert.AreEqual(IP_Destination, P.IP_Destination);
+            Assert.IsTrue(IP_DestinationBytes.SequenceEqual(Package.extract(2, 4, P.toBytes())));
+
+            P.changeSourceIP(IP_Source.ToString());
+            Assert.AreEqual(IP_Source, P.IP_Source);
+            Assert.IsTrue(IP_SourceBytes.SequenceEqual(Package.extract(6, 4, P.toBytes())));
+
+            P.changePackageNumber(packageNumber);
+            Assert.AreEqual(packageNumber, P.packageNumber);
+            Assert.IsTrue(packageNumberBytes.SequenceEqual(Package.extract(10, 2, P.toBytes())));
+
+            P.changeFrequency(frequency);
+            Assert.AreEqual(frequency, P.frequency);
+            Assert.IsTrue(frequencyBytes.SequenceEqual(Package.extract(12, 2, P.toBytes())));
+
+            P.changeBand(band);
+            Assert.AreEqual(band, P.band);
+            Assert.IsTrue(bandBytes.SequenceEqual(Package.extract(14, 2, P.toBytes())));
+
+            P.changeUsableInfoLength(usableInfoLength);
+            Assert.AreEqual(usableInfoLength, P.usableInfoLength);
+            Assert.IsTrue(usableInfoLengthBytes.SequenceEqual(Package.extract(16, 2, P.toBytes())));
+
+            P.changeModulationPerformance(modulationPerformance);
+            Assert.AreEqual(modulationPerformance, P.modulationPerformance);
+            Assert.IsTrue(modulationPerformanceBytes.SequenceEqual(Package.extract(18, 2, P.toBytes())));
+
+            P.changeBitRate(bitRate);
+            Assert.AreEqual(bitRate, P.bitRate);
+            Assert.IsTrue(bitRateBytes.SequenceEqual(Package.extract(20, 2, P.toBytes())));
+
+            P.changeID(ID);
+            Assert.AreEqual(ID, P.ID);
+            Assert.IsTrue(IDBytes.SequenceEqual(Package.extract(22, 2, P.toBytes())));
+        }
+    }
 }
