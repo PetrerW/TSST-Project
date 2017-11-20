@@ -1,7 +1,0 @@
-E:\Piotr\Programowanie\C#\TSST-Project.git\branches\Piotrek\NetworkEmulation\NetworkingTools.cs\bin\Debug\NetworkingTools.cs.exe.config
-E:\Piotr\Programowanie\C#\TSST-Project.git\branches\Piotrek\NetworkEmulation\NetworkingTools.cs\bin\Debug\NetworkingTools.cs.exe
-E:\Piotr\Programowanie\C#\TSST-Project.git\branches\Piotrek\NetworkEmulation\NetworkingTools.cs\bin\Debug\NetworkingTools.cs.pdb
-E:\Piotr\Programowanie\C#\TSST-Project.git\branches\Piotrek\NetworkEmulation\NetworkingTools.cs\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
-E:\Piotr\Programowanie\C#\TSST-Project.git\branches\Piotrek\NetworkEmulation\NetworkingTools.cs\obj\Debug\NetworkingTools.cs.csprojResolveAssemblyReference.cache
-E:\Piotr\Programowanie\C#\TSST-Project.git\branches\Piotrek\NetworkEmulation\NetworkingTools.cs\obj\Debug\NetworkingTools.cs.exe
-E:\Piotr\Programowanie\C#\TSST-Project.git\branches\Piotrek\NetworkEmulation\NetworkingTools.cs\obj\Debug\NetworkingTools.cs.pdb
