@@ -7,3 +7,14 @@ C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\NetworkC
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\NetworkCableCloud\bin\Debug\NetworkingTools.pdb
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\NetworkCableCloud\obj\Debug\NetworkEmulation.exe
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\NetworkCableCloud\obj\Debug\NetworkEmulation.pdb
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkCableCloud\bin\Debug\NetworkEmulation.exe.config
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkCableCloud\bin\Debug\NetworkEmulation.exe
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkCableCloud\bin\Debug\NetworkEmulation.pdb
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkCableCloud\bin\Debug\NetworkingTools.exe
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkCableCloud\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkCableCloud\bin\Debug\NetworkNode.exe
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkCableCloud\bin\Debug\NetworkingTools.pdb
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkCableCloud\bin\Debug\NetworkNode.pdb
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkCableCloud\obj\Debug\NetworkCableCloud.csprojResolveAssemblyReference.cache
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkCableCloud\obj\Debug\NetworkEmulation.exe
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkCableCloud\obj\Debug\NetworkEmulation.pdb
