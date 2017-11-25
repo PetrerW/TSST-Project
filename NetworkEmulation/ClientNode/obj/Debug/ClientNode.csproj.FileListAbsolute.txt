@@ -16,3 +16,37 @@ C:\Users\Damian\Desktop\TSST nasz\NetworkEmulation\ClientNode\obj\Debug\ClientNo
 C:\Users\Damian\Desktop\TSST nasz\NetworkEmulation\ClientNode\obj\Debug\ClientNode.Form1.resources
 C:\Users\Damian\Desktop\TSST nasz\NetworkEmulation\ClientNode\obj\Debug\ClientNode.Properties.Resources.resources
 C:\Users\Damian\Desktop\TSST nasz\NetworkEmulation\ClientNode\obj\Debug\ClientNode.csproj.GenerateResource.Cache
+C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\ClientNode\bin\Debug\ClientNode.exe.config
+C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\ClientNode\obj\Debug\ClientNode.exe
+C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\ClientNode\obj\Debug\ClientNode.pdb
+C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\ClientNode\bin\Debug\ClientNode.exe
+C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\ClientNode\bin\Debug\ClientNode.pdb
+C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\ClientNode\obj\Debug\ClientNode.csprojResolveAssemblyReference.cache
+C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\ClientNode\obj\Debug\ClientNode.Form1.resources
+C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\ClientNode\obj\Debug\ClientNode.Properties.Resources.resources
+C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\ClientNode\obj\Debug\ClientNode.csproj.GenerateResource.Cache
+D:\STUDIA\STUDIA\SEMESTR5-TIZ\TSST_17z\TSST\NetworkEmulation\ClientNode\bin\Debug\ClientNode.exe.config
+D:\STUDIA\STUDIA\SEMESTR5-TIZ\TSST_17z\TSST\NetworkEmulation\ClientNode\obj\Debug\ClientNode.exe
+D:\STUDIA\STUDIA\SEMESTR5-TIZ\TSST_17z\TSST\NetworkEmulation\ClientNode\obj\Debug\ClientNode.pdb
+D:\STUDIA\STUDIA\SEMESTR5-TIZ\TSST_17z\TSST\NetworkEmulation\ClientNode\bin\Debug\ClientNode.exe
+D:\STUDIA\STUDIA\SEMESTR5-TIZ\TSST_17z\TSST\NetworkEmulation\ClientNode\bin\Debug\ClientNode.pdb
+D:\STUDIA\STUDIA\SEMESTR5-TIZ\TSST_17z\TSST\NetworkEmulation\ClientNode\obj\Debug\ClientNode.csprojResolveAssemblyReference.cache
+D:\STUDIA\STUDIA\SEMESTR5-TIZ\TSST_17z\TSST\NetworkEmulation\ClientNode\obj\Debug\ClientNode.Form1.resources
+D:\STUDIA\STUDIA\SEMESTR5-TIZ\TSST_17z\TSST\NetworkEmulation\ClientNode\obj\Debug\ClientNode.Properties.Resources.resources
+D:\STUDIA\STUDIA\SEMESTR5-TIZ\TSST_17z\TSST\NetworkEmulation\ClientNode\obj\Debug\ClientNode.csproj.GenerateResource.Cache
+D:\STUDIA\STUDIA\SEMESTR5-TIZ\TSST_17z\TSST\NetworkEmulation\ClientNode\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+D:\STUDIA\STUDIA\SEMESTR5-TIZ\TSST_17z\TSST\NetworkEmulation\ClientNode\bin\Debug\NetworkingTools.exe
+D:\STUDIA\STUDIA\SEMESTR5-TIZ\TSST_17z\TSST\NetworkEmulation\ClientNode\bin\Debug\NetworkingTools.pdb
+D:\STUDIA\STUDIA\SEMESTR5-TIZ\TSST_17z\TSST_EON\NetworkEmulation\ClientNode\bin\Debug\ClientNode.exe.config
+D:\STUDIA\STUDIA\SEMESTR5-TIZ\TSST_17z\TSST_EON\NetworkEmulation\ClientNode\obj\Debug\ClientNode.exe
+D:\STUDIA\STUDIA\SEMESTR5-TIZ\TSST_17z\TSST_EON\NetworkEmulation\ClientNode\obj\Debug\ClientNode.pdb
+D:\STUDIA\STUDIA\SEMESTR5-TIZ\TSST_17z\TSST_EON\NetworkEmulation\ClientNode\bin\Debug\ClientNode.exe
+D:\STUDIA\STUDIA\SEMESTR5-TIZ\TSST_17z\TSST_EON\NetworkEmulation\ClientNode\bin\Debug\ClientNode.pdb
+D:\STUDIA\STUDIA\SEMESTR5-TIZ\TSST_17z\TSST_EON\NetworkEmulation\ClientNode\bin\Debug\NetworkingTools.exe
+D:\STUDIA\STUDIA\SEMESTR5-TIZ\TSST_17z\TSST_EON\NetworkEmulation\ClientNode\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+D:\STUDIA\STUDIA\SEMESTR5-TIZ\TSST_17z\TSST_EON\NetworkEmulation\ClientNode\bin\Debug\NetworkingTools.pdb
+D:\STUDIA\STUDIA\SEMESTR5-TIZ\TSST_17z\TSST_EON\NetworkEmulation\ClientNode\obj\Debug\ClientNode.csprojResolveAssemblyReference.cache
+D:\STUDIA\STUDIA\SEMESTR5-TIZ\TSST_17z\TSST_EON\NetworkEmulation\ClientNode\obj\Debug\ClientNode.Properties.Resources.resources
+D:\STUDIA\STUDIA\SEMESTR5-TIZ\TSST_17z\TSST_EON\NetworkEmulation\ClientNode\obj\Debug\ClientNode.csproj.GenerateResource.Cache
+D:\STUDIA\STUDIA\SEMESTR5-TIZ\TSST_17z\TSST_EON\NetworkEmulation\ClientNode\obj\Debug\ClientNode.ClientApplication.resources
+D:\STUDIA\STUDIA\SEMESTR5-TIZ\TSST_17z\TSST_EON\NetworkEmulation\ClientNode\obj\Debug\ClientNode.StartClientApplication.resources
