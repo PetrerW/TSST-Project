@@ -69,6 +69,4 @@ E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\ClientNode\bin\Debug\Cli
 E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\ClientNode\bin\Debug\ClientNode.pdb
 E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\ClientNode\bin\Debug\NetworkingTools.exe
 E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\ClientNode\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
-E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\ClientNode\bin\Debug\NetworkNode.exe
 E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\ClientNode\bin\Debug\NetworkingTools.pdb
-E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\ClientNode\bin\Debug\NetworkNode.pdb

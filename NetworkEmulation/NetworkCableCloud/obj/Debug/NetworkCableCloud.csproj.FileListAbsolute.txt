@@ -12,9 +12,7 @@ E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkCableCloud\bin\De
 E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkCableCloud\bin\Debug\NetworkEmulation.pdb
 E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkCableCloud\bin\Debug\NetworkingTools.exe
 E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkCableCloud\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
-E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkCableCloud\bin\Debug\NetworkNode.exe
 E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkCableCloud\bin\Debug\NetworkingTools.pdb
-E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkCableCloud\bin\Debug\NetworkNode.pdb
 E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkCableCloud\obj\Debug\NetworkCableCloud.csprojResolveAssemblyReference.cache
 E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkCableCloud\obj\Debug\NetworkEmulation.exe
 E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkCableCloud\obj\Debug\NetworkEmulation.pdb
