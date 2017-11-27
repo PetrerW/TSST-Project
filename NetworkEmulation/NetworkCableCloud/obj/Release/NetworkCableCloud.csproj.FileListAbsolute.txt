@@ -1,9 +1,0 @@
-C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\NetworkCableCloud\bin\Release\NetworkEmulation.exe.config
-C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\NetworkCableCloud\bin\Release\NetworkEmulation.exe
-C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\NetworkCableCloud\bin\Release\NetworkEmulation.pdb
-C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\NetworkCableCloud\bin\Release\NetworkingTools.exe
-C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\NetworkCableCloud\bin\Release\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
-C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\NetworkCableCloud\bin\Release\NetworkingTools.pdb
-C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\NetworkCableCloud\obj\Release\NetworkCableCloud.csprojResolveAssemblyReference.cache
-C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\NetworkCableCloud\obj\Release\NetworkEmulation.exe
-C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\NetworkCableCloud\obj\Release\NetworkEmulation.pdb
