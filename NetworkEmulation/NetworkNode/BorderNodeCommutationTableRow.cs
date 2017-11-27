@@ -9,8 +9,9 @@ namespace NetworkNode
 {
     /// <summary>
     /// Klasa zawierająca tablicę komutacji pakietów w węzłach na brzegu sieci.
+    /// TODO: Dodaj pole zwiazane z odlegloscia od celu, cos jak AS-PATH czy ilosc hopow. NMS bedzie to wpisywal
     /// </summary>
-    class BorderNodeCommutationTableRow
+    public class BorderNodeCommutationTableRow
     {
         /// <summary>
         /// Jakim adresem IP przyszedł pakiet?
@@ -52,13 +53,72 @@ namespace NetworkNode
         /// </summary>
         public short socketPort { get; set; }
 
+        /// <summary>
+        /// Ile hopow pokona pakiet od brzegowego routera?
+        /// </summary>
+        public short hopsNumber { get; set; }
+
         public BorderNodeCommutationTableRow()
         {
             //empty
         }
 
+        /// <summary>
+        /// Konstruktor ze wszystkimi parametrami.
+        /// </summary>
+        /// <param name="IP_IN"></param>
+        /// <param name="port_in"></param>
+        /// <param name="band"></param>
+        /// <param name="frequency"></param>
+        /// <param name="modulationPerformance"></param>
+        /// <param name="bitRate"></param>
+        /// <param name="IPSocketOUT"></param>
+        /// <param name="socketPort"></param>
+        public BorderNodeCommutationTableRow(string IP_IN, short port_in, short band, short frequency,
+            short modulationPerformance, short bitRate, string IPSocketOUT, short socketPort, short hopsNumber)
+        {
+            this.IP_IN = IPAddress.Parse(IP_IN);
+            this.port_in = port_in;
+            this.band = band;
+            this.frequency = frequency;
+            this.modulationPerformance = modulationPerformance;
+            this.bitRate = bitRate;
+            this.IPSocketOUT = IPAddress.Parse(IPSocketOUT);
+            this.socketPort = socketPort;
+            this.hopsNumber = hopsNumber;
+        }
 
-
-
+        /// <summary>
+        /// TODO: Przemysl jakie parametry na wejsciu i wyjsciu beda
+        /// Funkcja obliczajaca efektywnosc modulacji na podstawie ilosci hopow do celu, jaka modulacje ma uzyc.
+        /// </summary>
+        /// <param name="hopsNumber"></param>
+        public static short determineModulationPerformance(short hopsNumber)
+        {
+            /*
+            switch (hopsNumber)
+            {
+                case 1:
+                    return 8;
+                case 2:
+                    return 7;
+                case 3:
+                    return 6;
+                case 4:
+                    return 5;
+                case 5:
+                    return 4;
+                case 6:
+                    return 3;
+                case 7:
+                    return 2;
+                default:
+                    return 1;
+            }
+            if (hopsNumber <= 7)
+                return (short)(9 - hopsNumber);
+                */
+            return 0;
+        }
     }
 }

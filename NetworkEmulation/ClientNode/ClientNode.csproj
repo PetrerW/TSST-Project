@@ -93,7 +93,7 @@
   <ItemGroup>
     <ProjectReference Include="..\NetworkingTools\NetworkingTools.csproj">
       <Project>{bddee68b-ac6f-4863-8b9a-69952287c4f7}</Project>
-      <Name>NetworkingTools.cs</Name>
+      <Name>NetworkingTools</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

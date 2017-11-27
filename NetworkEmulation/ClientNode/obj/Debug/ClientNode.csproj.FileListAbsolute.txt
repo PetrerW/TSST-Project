@@ -57,3 +57,16 @@ C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\ClientNo
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\ClientNode\bin\Debug\NetworkingTools.exe
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\ClientNode\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\ClientNode\bin\Debug\NetworkingTools.pdb
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\ClientNode\bin\Debug\ClientNode.exe.config
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\ClientNode\obj\Debug\ClientNode.exe
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\ClientNode\obj\Debug\ClientNode.pdb
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\ClientNode\obj\Debug\ClientNode.csprojResolveAssemblyReference.cache
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\ClientNode\obj\Debug\ClientNode.ClientApplication.resources
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\ClientNode\obj\Debug\ClientNode.Properties.Resources.resources
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\ClientNode\obj\Debug\ClientNode.StartClientApplication.resources
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\ClientNode\obj\Debug\ClientNode.csproj.GenerateResource.Cache
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\ClientNode\bin\Debug\ClientNode.exe
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\ClientNode\bin\Debug\ClientNode.pdb
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\ClientNode\bin\Debug\NetworkingTools.exe
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\ClientNode\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\ClientNode\bin\Debug\NetworkingTools.pdb

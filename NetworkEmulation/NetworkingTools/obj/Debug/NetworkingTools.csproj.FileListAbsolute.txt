@@ -5,3 +5,10 @@ C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\Networki
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\NetworkingTools\obj\Debug\NetworkingTools.exe
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\NetworkingTools\obj\Debug\NetworkingTools.pdb
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\NetworkingTools\obj\Debug\NetworkingTools.csprojResolveAssemblyReference.cache
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkingTools\bin\Debug\NetworkingTools.exe.config
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkingTools\bin\Debug\NetworkingTools.exe
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkingTools\bin\Debug\NetworkingTools.pdb
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkingTools\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkingTools\obj\Debug\NetworkingTools.csprojResolveAssemblyReference.cache
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkingTools\obj\Debug\NetworkingTools.exe
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkingTools\obj\Debug\NetworkingTools.pdb
