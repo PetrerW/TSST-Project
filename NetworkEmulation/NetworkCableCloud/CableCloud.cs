@@ -9,6 +9,7 @@ using System.Net;
 using System.Configuration;
 using NetworkingTools;
 using System.Collections.Specialized;
+using System.Net.NetworkInformation;
 
 namespace NetworkCalbleCloud
 {
@@ -48,11 +49,17 @@ namespace NetworkCalbleCloud
 
         private static List<string> tableTo = new List<string>();
 
+       // private static List<List<byte[]>> listOfList = new List<List<byte[]>>();
+
 
         public static byte[] msg;
 
 
-        private static short numberPort;
+        private static short frequency;
+
+        private static bool Listening = true;
+
+        private static bool Last = true;
 
 
         static void Main(string[] args)
@@ -128,45 +135,68 @@ namespace NetworkCalbleCloud
                     //Uruchamiamy watek na kazdym z tworzonych sluchaczy
                     var task = Task.Run(() =>
                     {
-                        //Zmienna typu string wskazujaca socket na ktorym odebrana została wiadomosc oraz częstotliwosc w formacie "adres f"
-                        string fromAndFrequency;
 
-                        //Wykorzystanie delegata ktory dodaje socket do listy sluchaczy po tym jak zwraca go funkcja ListenAsync
-                        Socket socket = sd(sl.ListenAsync(key.SettingsValue));
+                        ListenAsync(key.SettingsValue, key.Keysettings);
+                        /*      //Zmienna typu string wskazujaca socket na ktorym odebrana została wiadomosc oraz częstotliwosc w formacie "adres f"
+                              string fromAndFrequency;            
 
-                        //Utworzenie socketa na wysylanie
-                        Socket send = null;
+                              //Wykorzystanie delegata ktory dodaje socket do listy sluchaczy po tym jak zwraca go funkcja ListenAsync
+                              Socket socket = sd(sl.ListenAsync(key.SettingsValue));
+                              string addresstmp = takingAddresListenerSocket(socket);
 
-                        //Znajac dlugosc slowa "Listener" pobieram z calej nazwy klucza tylko index, ktory wykorzystam aby dopasowac do socketu OUT
-                        str = key.Keysettings.Substring(8, key.Keysettings.Length - 8);
+                              //Utworzenie socketa na wysylanie
+                              Socket send = null;
 
-                        //Sklejenie czesci wspolnej klucza dla socketu OUT oraz indeksu 
-                        settingsString = "Sending" + str;
+                              //Znajac dlugosc slowa "Listener" pobieram z calej nazwy klucza tylko index, ktory wykorzystam aby dopasowac do socketu OUT
+                              str = key.Keysettings.Substring(8, key.Keysettings.Length - 8);
 
-                        //Dodanie socketu do listy socketow OUT
-                        socketSendingList.Add(sS.ConnectToEndPoint(OperationConfiguration.getSetting(settingsString, readSettings)));
+                              //Sklejenie czesci wspolnej klucza dla socketu OUT oraz indeksu 
+                              settingsString = "Sending" + str;
 
-                        //Oczekiwanie w petli na przyjscie danych
-                        while (true)
-                        {
-                            //Odebranie tablicy bajtow na obslugiwanym w watku sluchaczu
-                            msg = sl.ProcessRecivedBytes(socket);
+                              //Dodanie socketu do listy socketow OUT
+                              socketSendingList.Add(sS.ConnectToEndPoint(OperationConfiguration.getSetting(settingsString, readSettings)));
 
-                            //Wykonuje jezeli nadal zestawione jest polaczenie
-                            if (socket.Connected)
-                            {
-                                //Uzyskanie czestotliwosci zawartej w naglowku- potrzebna do okreslenia ktorym laczem idzie wiadomosc
-                                numberPort = Package.extractPortNumber(msg);
-                                fromAndFrequency = takingAddresListenerSocket(socket) + " " + numberPort;
+                              //Oczekiwanie w petli na przyjscie danych
+                              while (true)
+                              {
+                                  //Odebranie tablicy bajtow na obslugiwanym w watku sluchaczu
+                                  msg = sl.ProcessRecivedBytes(socket);                            
 
-                                //wyznaczenie socketu przez ktory wyslana zostanie wiadomosc
-                                send = sendingThroughSocket(fromAndFrequency);
-                               Console.WriteLine( takingAddresSendingSocket(send));
-                                //wyslanei tablicy bajtow
-                                sS.SendingPackageBytes(send, msg);
-                            }
+                                  //Wykonuje jezeli nadal zestawione jest polaczenie
+                                  if (socket.Connected)
+                                  {
+                                      //Uzyskanie czestotliwosci zawartej w naglowku- potrzebna do okreslenia ktorym laczem idzie wiadomosc
+                                      frequency = Package.extractFrequency(msg);                                 
+                                      fromAndFrequency = takingAddresListenerSocket(socket) + " " + frequency;
 
-                        }
+                                      //wyznaczenie socketu przez ktory wyslana zostanie wiadomosc
+                                      send = sendingThroughSocket(fromAndFrequency);
+
+                                      //wyslanei tablicy bajtow
+                                      sS.SendingPackageBytes(send, msg);
+                                  }
+                                /*  else 
+                                  {
+                                      IPGlobalProperties ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
+                                      TcpConnectionInformation[] tcpConnInfoArray = ipGlobalProperties.GetActiveTcpConnections();
+                                      bool isAvailable=true;
+                                      foreach (TcpConnectionInformation tcpi in tcpConnInfoArray)
+                                      {
+                                          if (tcpi.LocalEndPoint.Port == 11000)
+                                          {
+                                              isAvailable = false;
+                                              break;
+                                          }
+                                      }
+
+
+                                      //               socket = sl.ListenAsync(addresstmp);
+                                      //socket.
+
+                              socket.Con
+                                  }*/
+
+                        //   }
                     });
 
 
@@ -248,6 +278,132 @@ namespace NetworkCalbleCloud
                 socketSendingList.Remove(socket);
             }
 
+        }
+
+        /// <summary>
+        /// Funkcja sluży do 
+        /// Zwraca socket
+        /// </summary>      
+        /// <param name="adresIPListener">Parametrem jest adres IP na ktorym nasluchujemy  </param>
+        ///  /// <param name="key">Parametrem jest warotsc klucza wlasnosci z pliku config  </param>
+        public static Socket ListenAsync(string adresIPListener, string key, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            Socket socketClient = null;
+            Socket listener = null;
+            IPAddress ipAddress =
+                         ipAddress = IPAddress.Parse(adresIPListener);
+            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);
+
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            try
+            {
+                byte[] bytes = new Byte[1024];
+
+                // Create a TCP/IP socket.  
+                listener = new Socket(ipAddress.AddressFamily,
+                   SocketType.Stream, ProtocolType.Tcp);
+
+                if (!listener.IsBound)
+                {
+                    //zabindowanie na sokecie punktu koncowego
+                    listener.Bind(localEndPoint);
+                    listener.Listen(100);
+                }
+
+                cancellationToken.ThrowIfCancellationRequested();
+
+                //Nasluchujemy bez przerwy
+                while (Last)
+                {
+
+                    if (Listening)
+                    {
+                        //oczekiwanie na polaczenie
+                        socketClient = listener.Accept();
+                        //dodanie do listy sluchaczy po przez delegata
+                        sd(socketClient);
+                        Socket send = null;
+
+                        //Znajac dlugosc slowa "Listener" pobieram z calej nazwy klucza tylko index, ktory wykorzystam aby dopasowac do socketu OUT
+                        string str = key.Substring(8, key.Length - 8);
+
+                        //Sklejenie czesci wspolnej klucza dla socketu OUT oraz indeksu 
+                        string settingsString = "Sending" + str;
+
+                        //Dodanie socketu do listy socketow OUT
+                        socketSendingList.Add(sS.ConnectToEndPoint(OperationConfiguration.getSetting(settingsString, readSettings)));
+                        Listening = false;
+                        LingerOption myOpts = new LingerOption(true, 1);
+                        socketClient.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Linger, myOpts);
+                        socketClient.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger, false);
+                        socketClient.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+
+                        Console.WriteLine("Polaczenie na  " + takingAddresListenerSocket(socketClient));
+
+                        Task.Run(() =>
+                        {
+                            
+                           // List<byte[]> listByte = new List<byte[]>();
+                            //listOfList.Add(listByte);
+                            string fromAndFrequency;
+
+
+                            //Oczekiwanie w petli na przyjscie danych
+                            while (true)
+                            {
+                                
+                                //Odebranie tablicy bajtow na obslugiwanym w watku sluchaczu
+
+                                msg = sl.ProcessRecivedBytes(socketClient);
+                               // Package.extractHowManyPackages(msg);
+                               // listByte.Add(msg);
+
+                                //Wykonuje jezeli nadal zestawione jest polaczenie
+                                if (socketClient.Connected)
+                                {
+                                    //Uzyskanie czestotliwosci zawartej w naglowku- potrzebna do okreslenia ktorym laczem idzie wiadomosc
+                                    frequency = Package.extractPortNumber(msg);
+                                    fromAndFrequency = takingAddresListenerSocket(socketClient) + " " + frequency;
+
+                                    //wyznaczenie socketu przez ktory wyslana zostanie wiadomosc
+                                    send = sendingThroughSocket(fromAndFrequency);
+
+                                    //wyslanei tablicy bajtow
+                                    sS.SendingPackageBytes(send, msg);
+                                }
+                                else
+                                {
+                                    //Jezeli host zerwie polaczneie to usuwamy go z listy przetrzymywanych socketow, aby rozpoczac proces nowego polaczenia
+                                    int numberRemove = socketListenerList.IndexOf(socketClient);
+                                    socketListenerList.RemoveAt(numberRemove);
+                                    socketSendingList.RemoveAt(numberRemove);
+                                    break;
+
+
+                                }
+                            }
+                            Listening = true;
+                        });
+                    }
+                }
+            }
+            catch (SocketException se)
+            {
+                Console.WriteLine($"Socket Exception: {se}");
+            }
+            finally
+            {
+                // StopListening();
+            }
+            if (socketClient == null)
+            {
+                return new Socket(ipAddress.AddressFamily,
+                           SocketType.Stream, ProtocolType.Tcp);
+            }
+
+            return socketClient;
         }
 
 

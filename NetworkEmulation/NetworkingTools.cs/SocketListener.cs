@@ -50,6 +50,7 @@ namespace NetworkingTools
                 // Create a TCP/IP socket.  
                 listener = new Socket(ipAddress.AddressFamily,
                    SocketType.Stream, ProtocolType.Tcp);
+
                 if (!listener.IsBound)
                 {
                     Listening = true;
@@ -58,9 +59,17 @@ namespace NetworkingTools
                 }
 
                 cancellationToken.ThrowIfCancellationRequested();
-                //zadanie polegajace na rozpoznaniu kolejnego chcacego sie poloczyc klienta
 
+                //zadanie polegajace na rozpoznaniu kolejnego chcacego sie poloczyc klienta
                 socketClient = listener.Accept();
+
+
+
+                LingerOption myOpts = new LingerOption(true, 1);
+                socketClient.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Linger, myOpts);
+                socketClient.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger, false);
+                socketClient.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+
                 Console.WriteLine("Connected to new client");
 
             }
@@ -77,7 +86,7 @@ namespace NetworkingTools
                 return new Socket(ipAddress.AddressFamily,
                            SocketType.Stream, ProtocolType.Tcp);
             }
-
+            listener.Close();
             return socketClient;
         }
 
@@ -161,7 +170,7 @@ namespace NetworkingTools
 
         }
 
-        public byte[] ProcessRecivedBytes(Socket client, CancellationToken cancellationToken = default(CancellationToken))
+        public byte[] ProcessRecivedBytes(Socket client,  CancellationToken cancellationToken = default(CancellationToken))
         {
             IPEndPoint ippoint = client.LocalEndPoint as IPEndPoint;
             cancellationToken.ThrowIfCancellationRequested();
@@ -171,18 +180,26 @@ namespace NetworkingTools
                 byte[] package;
                 int bytesRead = client.Receive(buffer);
 
-                //   try
-                //  {
+                
                 do
                 {
                     package = new byte[64];
                     Array.Copy(buffer, package, bytesRead);
-                    Console.WriteLine("We got: " + Package.exctractDestinationIP(package).ToString() + " " + Package.exctractSourceIP(package).ToString() + " " + Package.extractUsableMessage(package, Package.extractUsableInfoLength(package)));
+                    Console.WriteLine("We got: " + Package.exctractDestinationIP(package).ToString() + " " + Package.extractBand(package).ToString()
+                         + " " + Package.extractFrequency(package).ToString() + " " + Package.extractPackageNumber(package).ToString()
+                         + " " + Package.extractPortNumber(package).ToString() + " " + Package.extractUsableInfoLength(package).ToString()
+                        + " " + Package.exctractSourceIP(package).ToString() + " " + Package.extractUsableMessage(package, Package.extractUsableInfoLength(package)));
                     bytesRead = 0;
                 } while (bytesRead > 0);
 
+
                 return package.ToArray();
 
+            }
+            catch(OperationCanceledException)
+            {
+                Console.WriteLine("Timeout");
+                return null;
             }
             catch (ObjectDisposedException)
             {
@@ -193,7 +210,9 @@ namespace NetworkingTools
             {
 
                 Console.WriteLine("Brak dostepu do polaczenia na sockecie " + ippoint.ToString());
-                client.Close();
+                //client.Close();
+                //client.Disconnect(true);
+
                 return null;
 
             }
@@ -208,5 +227,65 @@ namespace NetworkingTools
 
             }
         }
+
+        public byte[] ProcessRecivedBytes2(Socket client, CancellationToken cancellationToken)
+        {
+            IPEndPoint ippoint = client.LocalEndPoint as IPEndPoint;            
+            try
+            {
+                byte[] buffer = new byte[64];
+                byte[] package;
+                client.ReceiveTimeout = 200;
+                int bytesRead = client.Receive(buffer);
+
+
+                do
+                {
+                    package = new byte[64];
+                    Array.Copy(buffer, package, bytesRead);
+                    Console.WriteLine("We got: " + Package.exctractDestinationIP(package).ToString() + " " + Package.extractBand(package).ToString()
+                         + " " + Package.extractFrequency(package).ToString() + " " + Package.extractPackageNumber(package).ToString()
+                         + " " + Package.extractPortNumber(package).ToString() + " " + Package.extractUsableInfoLength(package).ToString()
+                        + " " + Package.exctractSourceIP(package).ToString() + " " + Package.extractUsableMessage(package, Package.extractUsableInfoLength(package)));
+                    bytesRead = 0;
+                } while (bytesRead > 0);
+
+
+                return package.ToArray();
+
+            }
+            catch (OperationCanceledException)
+            {
+                Console.WriteLine("Timeout");
+                return null;
+            }
+            catch (ObjectDisposedException)
+            {
+                Console.WriteLine("Polaczenie zostalo zerwane");
+                return null;
+            }
+            catch (SocketException)
+            {
+
+                Console.WriteLine("Brak dostepu do polaczenia na sockecie " + ippoint.ToString());
+                //client.Close();
+                //client.Disconnect(true);
+
+                return null;
+
+            }
+            catch (Exception ioe)
+            {
+                Console.WriteLine($"Read timed out: {ioe}");
+                return null;
+
+            }
+            finally
+            {
+
+            }
+        }
+
     }
+
 }

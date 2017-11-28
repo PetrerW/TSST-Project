@@ -15,7 +15,9 @@ namespace NetworkingTools
         /// <returns>Zwraca wartość znacznika czasowego</returns>
         public static string generateTimestamp()
         {
-            return DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture);
+            string time = null;
+            time = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture);
+            return time;
         }
 
     }

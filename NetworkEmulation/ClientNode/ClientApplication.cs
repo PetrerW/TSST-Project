@@ -133,9 +133,10 @@ namespace ClientNode
         /// <param name="e">Otrzymany event po naciśnięciu przycisku</param>
         private void buttonSend_Click(object sender, EventArgs e)
         {
+            short PackageID = 0;
             //Cel wysyłania naszej wiadomości, pobrany z comboBoxa
             string destination = comboBoxClients.SelectedItem.ToString();
-            //Ustawienie wartości false pozwala na zatrzymanie wysyłania
+            //Ustawienie wartości true pozwala na zatrzymanie wysyłania
             buttonStopSendingClicked = false;
             if (buttonSendClicked == false)
             {
@@ -146,30 +147,84 @@ namespace ClientNode
                     {
                         //Pobranie wiadomości
                         string message = textBoxMessage.Text;
-                        //Stworzenie wysyłanej paczki
-                        EONpackage = new Package(message, 1, destination, _ClientApplication.ClientIP);
-                        //Zamiana paczki na tablicę bajtów
-                        byte[] bytemessage = EONpackage.toBytes();
-                        //Stworzenie znacznika czasowego
-                        string timestamp = Timestamp.generateTimestamp();
-                        //Próba wysłania wiadomości odbywa sie tylko wtedy gdy jesteśmy podłaczeni do chmury
-                        if (send.Connected)
+                        int messageLength = message.Length;
+                        byte[] bytemessage;
+                        List<byte[]> packageList = new List<byte[]>();
+                        if (messageLength > Package.usableInfoMaxLength)
                         {
-                            //Wysłanie wiadomości (tablicy bajtów) za pośrednictwem gniazda
-                            sS.SendingPackageBytes(send, bytemessage);
-                            //Zaktualizowanie LogEventTextBoxa
-                            _ClientApplication.updateLogTextBox("[" + timestamp + "] == SENDING MESSAGE ==  D_ClientIP " + destination);
+
+                            double numberOfPackages = (Math.Ceiling((double)messageLength / Package.usableInfoMaxLength));
+                            for (int i = 0; i < numberOfPackages; i++)
+                            {
+                                if (i < numberOfPackages - 1)
+                                {
+                                    bytemessage = null;
+                                    EONpackage = new Package(message.Substring(i * Package.usableInfoMaxLength, Package.usableInfoMaxLength), 1, destination, _ClientApplication.ClientIP, Convert.ToInt16(Package.usableInfoMaxLength), Convert.ToInt16(i + 1), 0, 0, 0, 0, PackageID, Convert.ToInt16(numberOfPackages));
+                                    bytemessage = EONpackage.toBytes();
+                                }
+                                else
+                                {
+                                    bytemessage = null;
+                                    EONpackage = new Package(message.Substring(i * Package.usableInfoMaxLength, messageLength - i * Package.usableInfoMaxLength), 1, destination, _ClientApplication.ClientIP, Convert.ToInt16(Package.usableInfoMaxLength), Convert.ToInt16(i + 1), 0, 0, 0, 0, PackageID, Convert.ToInt16(numberOfPackages));
+                                    bytemessage = EONpackage.toBytes();
+                                }
+                                packageList.Add(bytemessage);
+                            }
+
+
+                            if (send.Connected)
+                            {
+                                for (int i = 0; i < packageList.Count(); i++)
+                                {
+
+                                    string timestamp2 = Timestamp.generateTimestamp();
+
+                                    //Wysłanie wiadomości (tablicy bajtów) za pośrednictwem gniazda
+                                    sS.SendingPackageBytes(send, packageList[i]);
+                                    _ClientApplication.updateLogTextBox("[" + timestamp2 + "] == SENDING PACKAGE number: " + (i + 1) + " == ");
+
+                                    var wait = await Task.Run(async () =>
+                                    {
+                                        Stopwatch sw = Stopwatch.StartNew();
+                                        await Task.Delay(1000);
+                                        sw.Stop();
+                                        return sw.ElapsedMilliseconds;
+                                    });
+                                }
+                            }
+
+                            //Stworzenie znacznika czasowego
+                            string timestamp = Timestamp.generateTimestamp();
+
+                            _ClientApplication.updateLogTextBox("[" + timestamp + "] == SENDING MESSAGE in " + numberOfPackages + " packages  == " + " D_ClientIP " + destination);
                         }
                         else
                         {
-                            MessageBox.Show("You need to be connected with Network Host!", "Info");
+
+                            //Stworzenie wysyłanej paczki
+                            bytemessage = null;
+                            EONpackage = new Package(message, 1, destination, _ClientApplication.ClientIP, Convert.ToInt16(Package.usableInfoMaxLength), Convert.ToInt16(1), 0, 0, 0, 0, Convert.ToInt16(PackageID), 1);
+                            bytemessage = EONpackage.toBytes();
+                            //Stworzenie znacznika czasowego
+                            string timestamp = Timestamp.generateTimestamp();
+                            //Zamiana paczki na tablicę bajtów
+
+                            if (send.Connected)
+                            {
+                                //Wysłanie wiadomości (tablicy bajtów) za pośrednictwem gniazda
+                                sS.SendingPackageBytes(send, bytemessage);
+                                //Zaktualizowanie LogEventTextBoxa
+                                _ClientApplication.updateLogTextBox("[" + timestamp + "] == SENDING MESSAGE ==  D_ClientIP " + destination);
+                            }
                         }
+
+                        PackageID++;
 
                         //Task, który służy wprowadzeniu opóźnienia między kolejnymi wysłanymi pakietami
                         var delay = await Task.Run(async () =>
                         {
                             Stopwatch sw = Stopwatch.StartNew();
-                            await Task.Delay(2000);
+                            await Task.Delay(3000);
                             sw.Stop();
                             return sw.ElapsedMilliseconds;
                         });
@@ -190,6 +245,8 @@ namespace ClientNode
         {
             if (buttonConnectToCloudClicked == false)
             {
+                buttonConnectToCloud.Enabled = false;
+                buttonConnectToCloudClicked = true;
                 //Pobranie indeksu na którym w liście znajduje się IP naszej klienckiej aplikacji
                 int cloudipindex = clientsiplist.IndexOf(_ClientApplication.ClientIP);
                 //Pobranie IP chmury z listy
@@ -206,21 +263,72 @@ namespace ClientNode
                         {
                             while (true)
                             {
+                                short howManyPackages = 1;
+                                byte[] messagebytes;
+                                List<byte[]> packages = new List<byte[]>();
                                 //Zamienienie odebranej wiadomości na tablicę bajtów
-                                byte[] messagebytes = sl.ProcessRecivedBytes(socket);
+                                messagebytes = sl.ProcessRecivedBytes(socket);
                                 //Utowrzenie znacznika czasowego
-                                string timestamp = Timestamp.generateTimestamp();
-                                //Odpakowanie adresy nadawcy z otrzymanej wiadomości
-                                string sourceIp = Package.exctractSourceIP(messagebytes).ToString();
-                                //Stworzenie wiadomości, która zostanie wyświetlona na ekranie - odpakowanie treści wiadomości z paczki
-                                string message2 = sourceIp + ": " + Package.extractUsableMessage(messagebytes, Package.extractUsableInfoLength(messagebytes));
-                                //Pojawienie się informacji o otrzymaniu wiadomości
-                                _ClientApplication.updateLogTextBox("[" + timestamp + "] == RECEIVED MESSAGE == S_ClientIP: " + sourceIp);
-                                //Zauktualizowanie wiadomości w polu ReceivedMessage
-                                _ClientApplication.updateReceivedMessageTextBox(message2);
-                                _ClientApplication.updateReceivedMessageTextBox("\r\n");
-                                message2 = null;
-                                messagebytes = null;
+                                string timestamp2 = Timestamp.generateTimestamp();
+                                string message = null;
+                                howManyPackages = Package.extractHowManyPackages(messagebytes);
+                                packages.Add(messagebytes);
+                                if (howManyPackages >= 2)
+                                {
+                                    //CancellationTokenSource cts = new CancellationTokenSource();
+                                    //cts.CancelAfter(100);
+                                    for (int i = 1; i < howManyPackages; i++)
+                                    {
+
+                                        messagebytes = null;
+                                        messagebytes = sl.ProcessRecivedBytes(socket);//2(socket, cts.Token);
+                                        packages.Add(messagebytes);
+                                    }
+
+                                    //Utowrzenie znacznika czasowego
+                                    string timestamp = Timestamp.generateTimestamp();
+
+                                    //Sortowanie paczek, jakby przy odbiorze paczki zamieniły się miejscami
+                                    for (int i = 0; i < packages.Count - 1; i++)
+                                    {
+                                        if (Package.extractPackageNumber(packages[i]) > Package.extractPackageNumber(packages[i + 1]))
+                                        {
+                                            byte[] tmp = packages[i];
+                                            packages[i] = packages[i + 1];
+                                            packages[i + 1] = tmp;
+                                        }
+                                    }
+
+                                    for (int i = 0; i < packages.Count(); i++)
+                                    {
+                                        message = message + Package.extractUsableMessage(packages[i], Package.extractUsableInfoLength(packages[i]));
+                                    }
+
+                                    //Odpakowanie adresy nadawcy z otrzymanej wiadomości
+                                    string sourceIp = Package.exctractSourceIP(messagebytes).ToString();
+                                    _ClientApplication.updateReceivedMessageTextBox(sourceIp + ": " + message);
+                                    _ClientApplication.updateReceivedMessageTextBox("\r\n");
+                                    _ClientApplication.updateLogTextBox("[" + timestamp + "] == RECEIVED MESSAGE in " + howManyPackages + " packages == S_ClientIP: " + sourceIp);
+                                    message = null;
+                                    messagebytes = null;
+                                    packages = null;
+                                }
+                                else
+                                {
+
+                                    //Odpakowanie adresy nadawcy z otrzymanej wiadomości
+                                    string sourceIp = Package.exctractSourceIP(messagebytes).ToString();
+                                    //Stworzenie wiadomości, która zostanie wyświetlona na ekranie - odpakowanie treści wiadomości z paczki
+                                    string message2 = sourceIp + ": " + Package.extractUsableMessage(messagebytes, Package.extractUsableInfoLength(messagebytes));
+                                    //Pojawienie się informacji o otrzymaniu wiadomości
+                                    _ClientApplication.updateLogTextBox("[" + timestamp2 + "] == RECEIVED MESSAGE == S_ClientIP: " + sourceIp);
+                                    //Zauktualizowanie wiadomości w polu ReceivedMessage
+                                    _ClientApplication.updateReceivedMessageTextBox(message2);
+                                    _ClientApplication.updateReceivedMessageTextBox("\r\n");
+                                    message2 = null;
+                                    messagebytes = null;
+                                }
+
                             }
                         });
                     }
@@ -228,13 +336,14 @@ namespace ClientNode
 
                     {
                         throw new NullReferenceException();
-                        buttonConnectToCloudClicked = true;
+                        buttonConnectToCloud.Enabled = true;
+                        buttonConnectToCloudClicked = false;
                     }
 
                 }
                 catch (Exception err)
                 {
-                    MessageBox.Show("Unable to connect to the cloud", "Attention!");
+                    MessageBox.Show("Unable to connect to the Network Host!", "Attention!");
                 }
             }
         }
@@ -246,10 +355,10 @@ namespace ClientNode
         /// <param name="e">Otrzymany event po naciśnięciu przycisku</param>
         private void buttonDifferentMessages_Click(object sender, EventArgs e)
         {
-
-            string message = null;
+            short PackageID = 0;
             //Pobranie celu do którego wysłana zostanie wiadomość
             string destination = comboBoxClients.SelectedItem.ToString();
+            //Zmiana ustawienia przycisku kończącego wysyłanie
             buttonStopSendingClicked = false;
             if (buttonSendRandomClicked == false)
             {
@@ -257,35 +366,88 @@ namespace ClientNode
                 {
                     while (buttonStopSendingClicked != true)
                     {
-                        message = null;
+                        string message = null;
                         //Wygnenerowanie losowej wiadomości o maksymalnej długości
-                        message = RandomMessageGenerator.generateRandomMessage(40);
-                        //Stworzenie paczki, która bedzie wysyłana do drugiego hosta
-                        EONpackage = new Package(message, 1, destination, _ClientApplication.ClientIP);
-                        //Zamiana wiadomości na tablice bajtów
-                        byte[] bytemessage = EONpackage.toBytes();
-                        //Stworzenie znacznego czasowego
-                        string timestamp = Timestamp.generateTimestamp();
-                        if (send.Connected)
+                        message = RandomMessageGenerator.generateRandomMessage(1000);
+                        //Pobranie wiadomości                        
+                        int messageLength = message.Length;
+                        byte[] bytemessage;
+                        List<byte[]> packageList = new List<byte[]>();
+                        if (messageLength > Package.usableInfoMaxLength)
                         {
-                            //Wysłanie wiadomości do chmury
-                            sS.SendingPackageBytes(send, bytemessage);
-                            //Zaktualizowanie wiadomości w polu LogEvent
-                            _ClientApplication.updateLogTextBox("[" + timestamp + "] == SENDING MESSAGE ==  D_ClientIP " + destination);
+                            double numberOfPackages = (Math.Ceiling((double)messageLength / Package.usableInfoMaxLength));
+                            for (int i = 0; i < numberOfPackages; i++)
+                            {
+                                if (i < numberOfPackages - 1)
+                                {
+                                    bytemessage = null;
+                                    EONpackage = new Package(message.Substring(i * Package.usableInfoMaxLength, Package.usableInfoMaxLength), 1, destination, _ClientApplication.ClientIP, Convert.ToInt16(Package.usableInfoMaxLength), Convert.ToInt16(i + 1), 0, 0, 0, 0, PackageID, Convert.ToInt16(numberOfPackages));
+                                    bytemessage = EONpackage.toBytes();
+                                }
+                                else
+                                {
+                                    bytemessage = null;
+                                    EONpackage = new Package(message.Substring(i * Package.usableInfoMaxLength, messageLength - i * Package.usableInfoMaxLength), 1, destination, _ClientApplication.ClientIP, Convert.ToInt16(Package.usableInfoMaxLength), Convert.ToInt16(i + 1), 0, 0, 0, 0, PackageID, Convert.ToInt16(numberOfPackages));
+                                    bytemessage = EONpackage.toBytes();
+                                }
+                                packageList.Add(bytemessage);
+                            }
+
+                            if (send.Connected)
+                            {
+                                for (int i = 0; i < packageList.Count(); i++)
+                                {
+                                    string timestamp2 = Timestamp.generateTimestamp();
+
+                                    //Wysłanie wiadomości (tablicy bajtów) za pośrednictwem gniazda
+                                    sS.SendingPackageBytes(send, packageList[i]);
+                                    //  _ClientApplication.updateLogTextBox("[" + timestamp2 + "] == SENDING PACKAGE number: " + (i + 1) + " == ");
+
+                                    var wait = await Task.Run(async () =>
+                            {
+                                Stopwatch sw = Stopwatch.StartNew();
+                                await Task.Delay(1000);
+                                sw.Stop();
+                                return sw.ElapsedMilliseconds;
+                            });
+                                }
+                            }
+
+                            //Stworzenie znacznika czasowego
+                            string timestamp = Timestamp.generateTimestamp();
+
+                            _ClientApplication.updateLogTextBox("[" + timestamp + "] == SENDING MESSAGE in " + numberOfPackages + " packages  == " + " D_ClientIP " + destination);
                         }
                         else
                         {
-                            MessageBox.Show("You need to be connected with Network Host!", "Info");
+
+                            //Stworzenie wysyłanej paczki
+                            bytemessage = null;
+                            EONpackage = new Package(message, 1, destination, _ClientApplication.ClientIP, Convert.ToInt16(Package.usableInfoMaxLength), Convert.ToInt16(1), 0, 0, 0, 0, Convert.ToInt16(PackageID), 1);
+                            bytemessage = EONpackage.toBytes();
+                            //Stworzenie znacznika czasowego
+                            string timestamp = Timestamp.generateTimestamp();
+                            //Zamiana paczki na tablicę bajtów
+
+                            if (send.Connected)
+                            {
+                                //Wysłanie wiadomości (tablicy bajtów) za pośrednictwem gniazda
+                                sS.SendingPackageBytes(send, bytemessage);
+                                //Zaktualizowanie LogEventTextBoxa
+                                _ClientApplication.updateLogTextBox("[" + timestamp + "] == SENDING MESSAGE ==  D_ClientIP " + destination);
+                            }
                         }
 
-                        //Uruchomienie taska, który będzie odpowiadał za opóźnienie wysyłania kolejnych wiadomości
+                        PackageID++;
+
+                        //Task, który służy wprowadzeniu opóźnienia między kolejnymi wysłanymi pakietami
                         var delay = await Task.Run(async () =>
-                        {
-                            Stopwatch sw = Stopwatch.StartNew();
-                            await Task.Delay(2000);
-                            sw.Stop();
-                            return sw.ElapsedMilliseconds;
-                        });
+                {
+                    Stopwatch sw = Stopwatch.StartNew();
+                    await Task.Delay(3000);
+                    sw.Stop();
+                    return sw.ElapsedMilliseconds;
+                });
                     }
                 });
             }
