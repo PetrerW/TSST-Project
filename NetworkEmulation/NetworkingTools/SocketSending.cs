@@ -8,11 +8,12 @@ using System.Net.Sockets;
 
 namespace NetworkingTools
 {
-   public class SocketSending
+    public class SocketSending
     {
-       private static IPAddress ipAddress;
-       private static IPEndPoint remoteEP;
+        private static IPAddress ipAddress;
+        private static IPEndPoint remoteEP;
         private static Socket sendSocket;
+        private Object thislock = new object();
 
 
         public Socket ConnectToEndPoint(string IP)
@@ -36,21 +37,22 @@ namespace NetworkingTools
             {
                 return null;
             }
-            
+
         }
 
-        public void SendingPackage(Socket socket,string msg)
+        public void SendingPackage(Socket socket, string msg)
         {
-            try {
+            try
+            {
                 byte[] byteData = Encoding.ASCII.GetBytes(msg);
 
                 socket.Send(byteData);
             }
-            catch(SocketException)
+            catch (SocketException)
             {
 
             }
-            catch(Exception)
+            catch (Exception)
             {
 
             }
@@ -60,8 +62,10 @@ namespace NetworkingTools
             try
             {
                 // byte[] byteData = msg;
-
-                socket.Send(msg);
+                lock (thislock)
+                {
+                    socket.Send(msg);
+                }
             }
             catch (SocketException)
             {

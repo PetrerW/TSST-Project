@@ -79,6 +79,52 @@ namespace NetworkingTools
         }
 
         /// <summary>
+        /// Testuje konstruktor Package(tablica bajtow)
+        /// </summary>
+        [TestMethod]
+        public void packageBytesConstructorTest()
+        {
+            string inscription = "Mam malo wody";
+            short portNumber = 2;
+            IPAddress IP_Source = IPAddress.Parse("192.168.0.1");
+            IPAddress IP_Destination = IPAddress.Parse("192.168.0.10");
+            short packageNumber = 5;
+            short frequency = 2;
+            short band = 4;
+            short usableInfoLength = (short)inscription.Length;
+            short modulationPerformance = 1;
+            short bitRate = 7;
+            short ID = 17;
+            short howManyPackages = 1;
+
+            //Stworzenie pakietu
+            Package P = new Package(inscription, portNumber, IP_Destination.ToString(), IP_Source.ToString(), usableInfoLength, packageNumber, frequency, band, modulationPerformance, bitRate, ID, howManyPackages);
+
+            //Stworzenie nowego pakietu jako kopia pierwszego
+            Package P2 = new Package(P.toBytes());
+
+            //Pakiety powinny miec rowne pola
+            Assert.AreEqual(P.portNumber, P2.portNumber);
+            Assert.AreEqual(P.IP_Destination, P2.IP_Destination);
+            Assert.AreEqual(P.IP_Source, P2.IP_Source);
+            Assert.AreEqual(P.packageNumber, P2.packageNumber);
+            Assert.AreEqual(P.frequency, P2.frequency);
+            Assert.AreEqual(P.band, P2.band);
+            Assert.AreEqual(P.usableInfoLength, P2.usableInfoLength);
+            Assert.AreEqual(P.modulationPerformance, P2.modulationPerformance);
+            Assert.AreEqual(P.bitRate, P2.bitRate);
+            Assert.AreEqual(P.ID, P2.ID);
+            Assert.AreEqual(P.howManyPackages, P2.howManyPackages);
+            Assert.AreEqual(P.usableMessage, P2.usableMessage);
+
+            Assert.IsTrue(P.usableInfoBytes.SequenceEqual(P2.usableInfoBytes));
+            Assert.IsTrue(P.headerBytes.SequenceEqual(P2.headerBytes));
+
+            //Pakiety nie powinny byc te same
+            Assert.AreNotSame(P, P2);
+        }
+
+        /// <summary>
         /// Testuje konstruktor Package(string usableMessage, short port, string IP_Source, string IP_Destination)
         /// </summary>
         [TestMethod]
@@ -91,7 +137,7 @@ namespace NetworkingTools
             IPAddress IP_Destination = IPAddress.Parse("127.10.20.30");
 
             Package P = new Package(inscription, portNumber,
-                IP_Destination.ToString(), IP_Source.ToString(),(short)inscription.Length);
+                IP_Destination.ToString(), IP_Source.ToString(), (short)inscription.Length);
 
             //Czy te napisy sie zgadzaja?
             Assert.AreEqual(inscription, P.usableMessage);

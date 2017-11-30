@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Net;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace NetworkingTools
 {
@@ -134,6 +136,41 @@ namespace NetworkingTools
 
             //zapisz pola do list z bajtamia
             this.toBytes();
+        }
+
+        /// <summary>
+        /// Konstruktor odtwarzajacy Pakiet z tablicy bajtow
+        /// </summary>
+        /// <param name="packageBytes"></param>
+        public Package(byte[] packageBytes)
+        {
+            //Wyekstraktowanie wartosci i przypisanie ich do konkretnych pol
+            this.portNumber = Package.extractPortNumber(packageBytes);
+            this.IP_Destination = Package.exctractDestinationIP(packageBytes);
+            this.IP_Source = Package.exctractSourceIP(packageBytes);
+            this.packageNumber = Package.extractPackageNumber(packageBytes);
+            this.frequency = Package.extractFrequency(packageBytes);
+            this.band = Package.extractBand(packageBytes);
+            this.usableInfoLength = Package.extractUsableInfoLength(packageBytes);
+            this.modulationPerformance = Package.extractModulationPerformance(packageBytes);
+            this.bitRate = Package.extractBitRate(packageBytes);
+            this.ID = Package.extractID(packageBytes);
+            this.howManyPackages = Package.extractHowManyPackages(packageBytes);
+            this.usableMessage = Package.extractUsableMessage(packageBytes, this.usableInfoLength);
+
+            this.headerBytes = new List<byte>();
+            this.usableInfoBytes = new List<byte>();
+
+            //Aktualizacja list z bajtami
+            for (int i = 0; i < headerMaxLength; i++)
+            {
+                headerBytes.Add(packageBytes[i]);
+            }
+
+            for (int i = headerMaxLength; i < headerMaxLength+usableInfoMaxLength; i++)
+            {
+                usableInfoBytes.Add(packageBytes[i]);
+            }
         }
 
         /// <summary>
@@ -512,7 +549,7 @@ namespace NetworkingTools
         /// <returns></returns>
         public static short extractHowManyPackages(byte[] packageBytes)
         {
-            //pasmo jest od 14 do 15 w tablicy
+            //ilość paczek znajduje się od 24 do 25
             byte[] bytes = Package.extract(24, 2, packageBytes);
 
             //konwertuje bajty na shorta, 0 to indeks mowiacy, skad zaczac w tablicy
@@ -651,6 +688,34 @@ namespace NetworkingTools
         {
             this.howManyPackages = howManyPackages;
             this.actualizeBytes();
+        }
+
+        /// <summary>
+        /// Zamienia obiekt klasy Package na tablice bajtow
+        /// </summary>
+        /// <param name="packet"></param>
+        /// <returns></returns>
+        public static byte[] PacketToByte(Package packet)
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            MemoryStream ms = new MemoryStream();
+            bf.Serialize(ms, packet);
+            return ms.ToArray();
+        }
+
+        /// <summary>
+        /// Zamienia tablice bajtow na obiekt klasy Package
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static Package ByteToPacket(byte[] data)
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            MemoryStream ms = new MemoryStream();
+            ms.Write(data, 0, data.Length);
+            ms.Seek(0, SeekOrigin.Begin);
+            object o = (object)bf.Deserialize(ms);
+            return (Package)o;
         }
     }
 }
