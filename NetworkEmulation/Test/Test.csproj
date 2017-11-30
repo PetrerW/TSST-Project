@@ -57,18 +57,6 @@
       <Project>{544438c2-f62e-4127-9720-61f2ebe18b25}</Project>
       <Name>ClientNode</Name>
     </ProjectReference>
-    <ProjectReference Include="..\NetworkCableCloud\NetworkCableCloud.csproj">
-      <Project>{86a84ff8-beb0-41de-8589-36a93848aee3}</Project>
-      <Name>NetworkCableCloud</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\NetworkingTools\NetworkingTools.csproj">
-      <Project>{bddee68b-ac6f-4863-8b9a-69952287c4f7}</Project>
-      <Name>NetworkingTools</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\NetworkNode\NetworkNode.csproj">
-      <Project>{0319f67a-d211-4caf-a147-7ed11d32d1e9}</Project>
-      <Name>NetworkNode</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -19,7 +19,7 @@ namespace Test
           //  ClientNode.Form1 form2 = new Form1();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            //Application.Run(new MultiFormContext(new ClientNode.Form1(), new Form1()));
+            Application.Run(new MultiFormContext(new ClientApplication("127.0.0.1","11000","11000"), new ClientApplication("127.0.0.1", "11000", "11000")));
 
         }
 

@@ -10,6 +10,9 @@ namespace NetworkNode
     {
         static void Main(string[] args)
         {
+            NetworkNode nd = new NetworkNode();
+            nd.Run();
+
         }
     }
 }

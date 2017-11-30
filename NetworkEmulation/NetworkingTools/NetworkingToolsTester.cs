@@ -91,7 +91,7 @@ namespace NetworkingTools
             IPAddress IP_Destination = IPAddress.Parse("127.10.20.30");
 
             Package P = new Package(inscription, portNumber,
-                IP_Destination.ToString(), IP_Source.ToString(),(short)inscription.Length);
+                IP_Destination.ToString(), IP_Source.ToString(), (short)inscription.Length);
 
             //Czy te napisy sie zgadzaja?
             Assert.AreEqual(inscription, P.usableMessage);

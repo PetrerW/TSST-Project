@@ -9,7 +9,6 @@ namespace NetworkNode
 {
     /// <summary>
     /// Klasa zawierająca tablicę komutacji pakietów w węzłach na brzegu sieci.
-    /// TODO: Dodaj pole zwiazane z odlegloscia od celu, cos jak AS-PATH czy ilosc hopow. NMS bedzie to wpisywal
     /// </summary>
     public class BorderNodeCommutationTableRow
     {
@@ -44,14 +43,14 @@ namespace NetworkNode
         public short bitRate { get; set; }
 
         /// <summary>
-        /// Na jaki adres chmury przesłać pakiet?
+        /// Adres celu
         /// </summary>
-        public IPAddress IPSocketOUT { get; set; }
+        public IPAddress IP_Destination { get; set; }
 
         /// <summary>
-        /// Na jaki port przeslać pakiet?
+        /// Na jaki port (routera) przeslać pakiet?
         /// </summary>
-        public short socketPort { get; set; }
+        public short Port { get; set; }
 
         /// <summary>
         /// Ile hopow pokona pakiet od brzegowego routera?
@@ -72,10 +71,11 @@ namespace NetworkNode
         /// <param name="frequency"></param>
         /// <param name="modulationPerformance"></param>
         /// <param name="bitRate"></param>
-        /// <param name="IPSocketOUT"></param>
-        /// <param name="socketPort"></param>
+        /// <param name="IP_Destination"></param>
+        /// <param name="Port"></param>
+        /// <param name="hopsNumber"></param>
         public BorderNodeCommutationTableRow(string IP_IN, short port_in, short band, short frequency,
-            short modulationPerformance, short bitRate, string IPSocketOUT, short socketPort, short hopsNumber)
+            short modulationPerformance, short bitRate, string IP_Destination, short Port, short hopsNumber)
         {
             this.IP_IN = IPAddress.Parse(IP_IN);
             this.port_in = port_in;
@@ -83,42 +83,9 @@ namespace NetworkNode
             this.frequency = frequency;
             this.modulationPerformance = modulationPerformance;
             this.bitRate = bitRate;
-            this.IPSocketOUT = IPAddress.Parse(IPSocketOUT);
-            this.socketPort = socketPort;
+            this.IP_Destination = IPAddress.Parse(IP_Destination);
+            this.Port = Port;
             this.hopsNumber = hopsNumber;
-        }
-
-        /// <summary>
-        /// TODO: Przemysl jakie parametry na wejsciu i wyjsciu beda
-        /// Funkcja obliczajaca efektywnosc modulacji na podstawie ilosci hopow do celu, jaka modulacje ma uzyc.
-        /// </summary>
-        /// <param name="hopsNumber"></param>
-        public static short determineModulationPerformance(short hopsNumber)
-        {
-            /*
-            switch (hopsNumber)
-            {
-                case 1:
-                    return 8;
-                case 2:
-                    return 7;
-                case 3:
-                    return 6;
-                case 4:
-                    return 5;
-                case 5:
-                    return 4;
-                case 6:
-                    return 3;
-                case 7:
-                    return 2;
-                default:
-                    return 1;
-            }
-            if (hopsNumber <= 7)
-                return (short)(9 - hopsNumber);
-                */
-            return 0;
         }
     }
 }

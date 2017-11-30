@@ -34,7 +34,7 @@ namespace NetworkNode
                 usableInfoLength, packageNumber, frequency, band);
 
             //Nowy wpis do tablicy komutacji pakietow, zawierajacy czestotliwosc z powyzszego pakietu
-            CommutationTableRow row = new CommutationTableRow(frequency, cloudSocketPort, cloudSocketIPAddress.ToString());
+            CommutationTableRow row = new CommutationTableRow(frequency, cloudSocketPort, frequency, portNumber);
 
             Assert.IsNotNull(row);
 
@@ -48,11 +48,11 @@ namespace NetworkNode
             node.commutationTable.Table.Add(row);
 
             //wyodrebnienie adresu IP socketa chmury i portu tego socketa
-            var tuple = node.determineCloudSocketIPAndPort(P.toBytes());
+            var tuple = node.determineFrequencyAndPort(P.toBytes());
            
             //sprawdzenie, czy sie zgadzaja
-            Assert.AreEqual(tuple.Item1, cloudSocketIPAddress);
-            Assert.AreEqual(tuple.Item2, cloudSocketPort);
+            Assert.AreEqual(tuple.Item1, frequency);
+            Assert.AreEqual(tuple.Item2, portNumber);
         }
 
         [TestMethod]
@@ -213,12 +213,13 @@ namespace NetworkNode
         [TestMethod]
         public void testAddCommutationTableRow()
         {
-            short frequency = 2;
-            short port = 3;
-            IPAddress IP = IPAddress.Parse("127.123.123.123");
+            short frequency_in = 2;
+            short port_in = 3;
+            short frequency_out = 4;
+            short port_out = 5;
 
             //stworzenie nowego rzedu
-            CommutationTableRow row = new CommutationTableRow(frequency, port, IP.ToString());
+            CommutationTableRow row = new CommutationTableRow(frequency_in, port_in, frequency_out, port_out);
 
             //stworzenie nowej tablicy komutacji
             CommutationTable table = new CommutationTable();
@@ -227,10 +228,10 @@ namespace NetworkNode
             table.Table.Add(row);
             
             //Powinny byc takie same
-            Assert.AreEqual(table.Table[0].IP_OUT, IP);
-            Assert.AreEqual(table.Table[0].port_out, port);
-            Assert.AreEqual(table.Table[0].frequency_in, frequency);
-
+            Assert.AreEqual(table.Table[0].frequency_out, frequency_out);
+            Assert.AreEqual(table.Table[0].port_out, port_out);
+            Assert.AreEqual(table.Table[0].frequency_in, frequency_in);
+            Assert.AreEqual(table.Table[0].port_in, port_in);
         }
 
         [TestMethod]
@@ -260,5 +261,85 @@ namespace NetworkNode
             Assert.AreEqual(row, table.Table[0]);
         }
 
+        [TestMethod]
+        public void testDetermineModulationPerformance()
+        {
+            for (int i = 1; i < 9; i++)
+            {
+                //i - ilosc hopow
+                //9-i - wartosc wydajnosci modulacji
+                Assert.AreEqual(9-i, BorderNodeCommutationTable.determineModulationPerformance((short)i));
+            }
+
+            //W przeciwnych przypadkach powinno zwrocic 1
+            Assert.AreEqual(1, BorderNodeCommutationTable.determineModulationPerformance(9));
+            Assert.AreEqual(1, BorderNodeCommutationTable.determineModulationPerformance(19));
+            Assert.AreEqual(1, BorderNodeCommutationTable.determineModulationPerformance(119));
+            Assert.AreEqual(1, BorderNodeCommutationTable.determineModulationPerformance(0));
+            Assert.AreEqual(1, BorderNodeCommutationTable.determineModulationPerformance(-1));
+            Assert.AreEqual(1, BorderNodeCommutationTable.determineModulationPerformance(-100));
+        }
+
+        [TestMethod]
+        public void testFindRow1()
+        {
+            string IP = "127.0.0.1";
+            short port = 2;
+
+            //Nowa tabela
+            BorderNodeCommutationTable table = new BorderNodeCommutationTable();
+
+            //Nowy rząd
+            BorderNodeCommutationTableRow row = new BorderNodeCommutationTableRow(IP, port, 0, 0 , 0 , 0 , "0.0.0.0", 0, 0);
+            
+            //Dodanie rzedu do tabeli
+            table.Table.Add(row);
+
+            Assert.AreEqual(row, table.FindRow(IP, port));
+
+            Assert.AreEqual(0, table.FindIndex(IP, port));
+        }
+
+        [TestMethod]
+        public void testGenerateCharacteristicInfo()
+        {
+            IPAddress IP_IN = IPAddress.Parse("123.123.123.123");
+            short port_in = 1;
+            short band = 2;
+            short frequency = 3;
+            short modulationPerformance = 4;
+            short bitRate = 5;
+            IPAddress IPSocketOut = IPAddress.Parse("234.234.234.234");
+            short socketPort = 6;
+            short hopsNumber = 7;
+
+            //stworzenie nowego rzedu tablicy komutacji routera brzegowego
+            BorderNodeCommutationTableRow row = new BorderNodeCommutationTableRow(IP_IN.ToString(), port_in, band, frequency,
+                modulationPerformance, bitRate, IPSocketOut.ToString(), socketPort, hopsNumber);
+
+            //pozostale dane do pakietu, korzysta tez z danych od pakietu
+            string inscription = "Mam malo wody";
+            short portNumber = port_in;
+            IPAddress IP_Source = IP_IN;
+            IPAddress IP_Destination = IPSocketOut;
+            short packageNumber = 5;
+            short usableInfoLength = (short)inscription.Length;
+            short ID = 17;
+            short howManyPackages = 1;
+
+            //Stworzenie pakietu
+            Package P = new Package(inscription, portNumber, IP_Destination.ToString(), IP_Source.ToString(), usableInfoLength, packageNumber, 0, 0, 0, 0, ID, howManyPackages);
+
+            BorderNodeCommutationTable table = new BorderNodeCommutationTable();
+
+            table.Table.Add(row);
+
+            Package P2 = new Package(RouterClientPortIn.GenerateCharacteristicInfo(P.toBytes(), ref table));
+
+            Assert.AreEqual(row.frequency, P2.frequency);
+            Assert.AreEqual(row.band, P2.band);
+            Assert.AreEqual(row.bitRate, P2.bitRate);
+            Assert.AreEqual(row.modulationPerformance, P2.modulationPerformance);
+        }
     }
 }

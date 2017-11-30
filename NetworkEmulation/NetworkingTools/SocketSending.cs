@@ -8,25 +8,29 @@ using System.Net.Sockets;
 
 namespace NetworkingTools
 {
-   public class SocketSending
+    public class SocketSending
     {
-       private static IPAddress ipAddress;
-       private static IPEndPoint remoteEP;
-        private static Socket sendSocket;
+        private  IPAddress ipAddress;
+        private  IPEndPoint remoteEP;
+        private  Socket sendSocket;
+        private Object thislock = new object();
 
 
         public Socket ConnectToEndPoint(string IP)
         {
             try
             {
-                ipAddress = IPAddress.Parse(IP);
-                remoteEP = new IPEndPoint(ipAddress, 11000);
+                lock(thislock)
+                {
+                    ipAddress = IPAddress.Parse(IP);
+                    remoteEP = new IPEndPoint(ipAddress, 11000);
 
-                // Create a TCP/IP socket.  
-                sendSocket = new Socket(ipAddress.AddressFamily,
-                    SocketType.Stream, ProtocolType.Tcp);
-                sendSocket.Connect((EndPoint)remoteEP);
-                return sendSocket;
+                    // Create a TCP/IP socket.  
+                    sendSocket = new Socket(ipAddress.AddressFamily,
+                        SocketType.Stream, ProtocolType.Tcp);
+                    sendSocket.Connect((EndPoint)remoteEP);
+                    return sendSocket;
+                }
             }
             catch (SocketException)
             {
@@ -36,21 +40,22 @@ namespace NetworkingTools
             {
                 return null;
             }
-            
+
         }
 
-        public void SendingPackage(Socket socket,string msg)
+        public void SendingPackage(Socket socket, string msg)
         {
-            try {
+            try
+            {
                 byte[] byteData = Encoding.ASCII.GetBytes(msg);
 
                 socket.Send(byteData);
             }
-            catch(SocketException)
+            catch (SocketException)
             {
 
             }
-            catch(Exception)
+            catch (Exception)
             {
 
             }
@@ -60,8 +65,10 @@ namespace NetworkingTools
             try
             {
                 // byte[] byteData = msg;
-
-                socket.Send(msg);
+                lock (thislock)
+                {
+                    socket.Send(msg);
+                }
             }
             catch (SocketException)
             {

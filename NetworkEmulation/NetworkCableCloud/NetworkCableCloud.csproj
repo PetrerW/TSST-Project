@@ -7,8 +7,8 @@
     <ProjectGuid>{86A84FF8-BEB0-41DE-8589-36A93848AEE3}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NetworkEmulation</RootNamespace>
-    <AssemblyName>NetworkEmulation</AssemblyName>
+    <RootNamespace>NetworkCableCloud</RootNamespace>
+    <AssemblyName>NetworkCableCloud</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -48,10 +48,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NetworkingTools\NetworkingTools.csproj">
+    <ProjectReference Include="..\NetworkingTools.cs\NetworkingTools.csproj">
       <Project>{bddee68b-ac6f-4863-8b9a-69952287c4f7}</Project>
       <Name>NetworkingTools</Name>
     </ProjectReference>

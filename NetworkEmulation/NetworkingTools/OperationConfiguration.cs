@@ -22,22 +22,22 @@ namespace NetworkingTools
         public string SettingsValue { get; private set; }
     }
 
-   
-  public  class OperationConfiguration
+
+    public class OperationConfiguration
     {
-        //lista zwracająca struktury zawierajace dwie wartosci typu string
-        // te wartosci to klucz warotosci oraz sama wartość
-       static List<Data> settings = new List<Data>();
-        static List<string> list = new List<string>();
+
+
 
         /*Funkcja zwraca liste struktur Data 
         *Odczytuje wszystkie ustawienia z pliku konfiguracyjnego i dodaje je do listy
         */
-       public static List<Data> ReadAllSettings(NameValueCollection appSettings)
+        public static List<Data> ReadAllSettings(NameValueCollection appSettings)
         {
+            List<Data> settings = new List<Data>();
+
             try
             {
-               
+
                 //jeżeli nie ma ustawień to funkcja zwraca null
                 if (appSettings.Count == 0)
                 {
@@ -60,12 +60,13 @@ namespace NetworkingTools
             }
         }
 
-       public static List<string> ReadAllKeys(NameValueCollection appSettings)
+        public static List<string> ReadAllKeys(NameValueCollection appSettings)
         {
+            List<string> list = new List<string>();
             try
             {
                 //wczytanie wszystkich własności z App.config
-                
+
                 //jeżeli nie ma ustawień to funkcja zwraca null
                 if (appSettings.Count == 0)
                 {
@@ -88,14 +89,14 @@ namespace NetworkingTools
             }
         }
         //Funkcja pozwala na pobranie wybranej własności, ustawien z App.config
-      public  static string getSetting(string key, NameValueCollection appSettings)
+        public static string getSetting(string key, NameValueCollection appSettings)
         {
             try
             {
-               
+
                 //zwraca wartość własności dla określonego klucza
                 //Gdy nie ma takiego klucza to zwracamy null
-                string result = appSettings[key] ??  null;
+                string result = appSettings[key] ?? null;
                 //zwracamy znaleziona wlasnosc
                 return result;
             }

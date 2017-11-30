@@ -19,14 +19,21 @@ namespace NetworkNode
         public short frequency_in { get; set; }
 
         /// <summary>
+        /// Port (numer łącza) z którego przychodzi pakiet
+        /// </summary>
+        public short port_in { get; set; }
+
+        /// <summary>
+        /// Częstotliwość, z którą wychodzi pakiet
+        /// </summary>
+        public short frequency_out { get; set; }
+
+        /// <summary>
         /// Na jaki port skierować pakiet?
         /// </summary>
         public short port_out { get; set; }
 
-        /// <summary>
-        /// Na jaki adres IP skierować pakiet?
-        /// </summary>
-        public IPAddress IP_OUT { get; set; }
+
 
         public CommutationTableRow()
         {
@@ -34,16 +41,18 @@ namespace NetworkNode
         }
 
         /// <summary>
-        /// Konstruktor ze wszystkimi parametrami.
+        /// Konstruktor wiersza tablicy komutacji
         /// </summary>
-        /// <param name="frequency_in"></param>
-        /// <param name="port_out"></param>
-        /// <param name="IP_OUT"></param>
-        public CommutationTableRow(short frequency_in, short port_out, string IP_OUT)
+        /// <param name="frequency_in">Częstotliwość z którą przychodzi pakiet</param>
+        /// <param name="port_in">Port (numer łącza) z którego przychodzi pakiet</param>
+        /// <param name="frequency_out">Częstotliwość, z którą wychodzi pakiet</param>
+        /// <param name="port_out">Port (numer łacza), którym wychodzi pakiet</param>
+        public CommutationTableRow(short frequency_in, short port_in, short frequency_out, short port_out)
         {
             this.frequency_in = frequency_in;
+            this.port_in = port_in;
+            this.frequency_out = frequency_out;
             this.port_out = port_out;
-            this.IP_OUT = IPAddress.Parse(IP_OUT);
         }
     }
 }
