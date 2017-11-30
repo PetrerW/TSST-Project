@@ -85,6 +85,11 @@ namespace NetworkNode
         /// </summary>
         public CommutationField commutationField;
 
+        /// <summary>
+        /// ID routera podawane na wejsciu
+        /// </summary>
+        public string numberOfRouter;
+
         public static object ConfigurationManager { get; private set; }
 
         public NetworkNode()
@@ -123,7 +128,7 @@ namespace NetworkNode
         {
 
             sd = new SocketDelegate(CallbackSocket);
-            string numberOfRouter = Console.ReadLine().ToString();
+            numberOfRouter = Console.ReadLine().ToString();
 
             //Zmienna do przechowywania klucza na adres wychodzacy powiazany z socketem sluchaczem
             string settingsString = "";
@@ -308,8 +313,13 @@ namespace NetworkNode
                                         //Dopoki cos jest w podkolejce
                                         while (listOfQueues[i].Count != 0)
                                         {
-                                            //Zdjecie z kolejki pakietu i wyslanie go
-                                            sS.SendingPackageBytes(send, listOfQueues[i].Dequeue());
+                                            //Element z listy kolejek moze byc nullem
+                                            if (listOfQueues[i] != null)
+                                            {
+                                                //Zdjecie z kolejki pakietu i wyslanie go
+                                                sS.SendingPackageBytes(send, listOfQueues[i].Dequeue());
+                                            }
+                                            //A jak jest nullem to nic nie robimy
                                         }
                                     }
                                 }

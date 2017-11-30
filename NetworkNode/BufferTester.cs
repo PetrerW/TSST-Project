@@ -251,7 +251,7 @@ namespace NetworkNode
             b.queue = generatePackageQueueFrequencies();
 
             //Oproznienie bufora i skopiowanie jego wartosci do listOfQueues
-            var listOfQueues = b.emptyBuffer();
+            var listOfQueues = b.emptyBufferIN();
 
             //Kolejka powinna byc pusta
             Assert.AreEqual(0, b.queue.Count);

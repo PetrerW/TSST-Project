@@ -42,6 +42,37 @@ namespace NetworkNode
         }
 
         /// <summary>
+        /// Dodaje do bufora nowy pakiet i wyproznia go w zaleznosci od tego, czy byl to ostatni pakiet w buforze, czy 
+        /// nie
+        /// </summary>
+        /// <param name="packageBytes"></param>
+        /// <returns></returns>
+        public Queue<byte[]> addPackage(byte[] packageBytes)
+        {
+            //Jezeli jest prawie pelen bufor...
+            if (queue.Count == bufferSize - 1)
+            {
+                //Tworzenie kopii oryginalnej kolejki
+                var returnQueue = new Queue<byte[]>(queue);
+
+                //Dodanie pakietu na ostatnie miejsce w kolejce
+                returnQueue.Enqueue(packageBytes);
+
+                //Czyscimy kojelke
+                queue.Clear();
+
+                //Zwracamy kopie tamtej kolejki
+                return returnQueue;
+            }
+            //Jak nie jest prawie pelen, to dodajemy po prostu pakiet do kolejki
+            else
+            {
+                queue.Enqueue(packageBytes);
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Funkcja, ktora sortuje dane w kolejce, posortowane czesci dodaje do 
         /// osobnych kolejek i wrzuca te kolejki do listy kolejek, odpowiadajacych konkretnemu socketowi.
         /// </summary>
@@ -49,7 +80,7 @@ namespace NetworkNode
         /// Liste kolejek pakietow
         /// TODO: A co jak podczas sortowania dojdzie nam nowy pakiet do bufora?
         /// </returns>
-        public List<Queue<byte[]>> emptyBuffer()
+        public List<Queue<byte[]>> emptyBufferIN()
         {
             //przypisanie do tymczasowej zmiennej posortowanego 
             Queue<byte[]> tempQueue = new Queue<byte[]>(sortQueueByFrequency(ref this.queue));
