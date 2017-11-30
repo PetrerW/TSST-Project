@@ -7,8 +7,8 @@
     <ProjectGuid>{86A84FF8-BEB0-41DE-8589-36A93848AEE3}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NetworkEmulation</RootNamespace>
-    <AssemblyName>NetworkEmulation</AssemblyName>
+    <RootNamespace>NetworkCableCloud</RootNamespace>
+    <AssemblyName>NetworkCableCloud</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

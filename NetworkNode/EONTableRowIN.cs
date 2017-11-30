@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace NetworkNode
 {
     /// <summary>
-    /// Rząd tabeli z systemu EON.
+    /// Klasa z rzedem tabeli zajetych pasm na wejsciu routera.
     /// </summary>
-    class EONTableRow
+    public class EONTableRowIN
     {
         /// <summary>
         /// Na jakiej częstotliwości zaczyna się pasmo?
@@ -20,10 +20,16 @@ namespace NetworkNode
         /// Zajęte pasmo na wejściu węzła.
         /// </summary>
         public short busyBandIN { get; set; }
-        
+
         /// <summary>
-        /// Zajęte pasmo na wyjściu węzła.
+        /// 
         /// </summary>
-        public short busyBandOUT { get; set; }
+        /// <param name="busyFrequency"></param>
+        /// <param name="busyBandIn"></param>
+        public EONTableRowIN(short busyFrequency, short busyBandIn )
+        {
+            this.busyBandIN = busyBandIn;
+            this.busyFrequency = busyFrequency;
+        }
     }
 }

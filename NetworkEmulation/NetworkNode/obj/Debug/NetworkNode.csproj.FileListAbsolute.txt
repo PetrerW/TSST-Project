@@ -1,0 +1,9 @@
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkNode\bin\Debug\NetworkNode.exe.config
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkNode\bin\Debug\NetworkNode.exe
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkNode\bin\Debug\NetworkNode.pdb
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkNode\obj\Debug\NetworkNode.csprojResolveAssemblyReference.cache
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkNode\obj\Debug\NetworkNode.exe
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkNode\obj\Debug\NetworkNode.pdb
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkNode\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkNode\bin\Debug\NetworkingTools.exe
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkNode\bin\Debug\NetworkingTools.pdb
