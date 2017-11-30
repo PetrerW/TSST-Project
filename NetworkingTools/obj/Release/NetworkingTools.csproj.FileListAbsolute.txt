@@ -1,0 +1,7 @@
+C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\NetworkingTools\bin\Release\NetworkingTools.exe.config
+C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\NetworkingTools\bin\Release\NetworkingTools.exe
+C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\NetworkingTools\bin\Release\NetworkingTools.pdb
+C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\NetworkingTools\bin\Release\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\NetworkingTools\obj\Release\NetworkingTools.csprojResolveAssemblyReference.cache
+C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\NetworkingTools\obj\Release\NetworkingTools.exe
+C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkCableCloud\NetworkingTools\obj\Release\NetworkingTools.pdb
