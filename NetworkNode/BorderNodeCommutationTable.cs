@@ -166,11 +166,21 @@ namespace NetworkNode
 
                 row = this.FindRow(p.IP_Source.ToString(), p.portNumber, p.IP_Destination.ToString());
 
-                p.changeBand(row.band);
-                p.changeFrequency(row.frequency);
-                p.changeModulationPerformance(row.modulationPerformance);
-                p.changeBitRate(row.bitRate);
-                p.changePort(row.Port);
+                //Gdy udalo sie znalezc wpis w tabeli, podmien pola naglowka
+                if (row != null)
+                {
+                    p.changeBand(row.band);
+                    p.changeFrequency(row.frequency);
+                    p.changeModulationPerformance(row.modulationPerformance);
+                    p.changeBitRate(row.bitRate);
+                    p.changePort(row.Port);
+                }
+                //Jak sie nie udalo, to wpisz -2 do czestotliwosci
+                else
+                {
+                    //-2 oznacza "upusc pakiet"
+                    p.changeFrequency(-2);
+                }
 
                 msg = p.toBytes();
             }

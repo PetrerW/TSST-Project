@@ -19,3 +19,17 @@ C:\Users\Damian\Desktop\NetworkEmulation\NetworkingTools.cs\bin\Debug\Networking
 C:\Users\Damian\Desktop\NetworkEmulation\NetworkingTools.cs\bin\Debug\NetworkingTools.pdb
 C:\Users\Damian\Desktop\NetworkEmulation\NetworkingTools.cs\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
 C:\Users\Damian\Desktop\NetworkEmulation\NetworkingTools.cs\obj\Debug\NetworkingTools.csprojResolveAssemblyReference.cache
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkingTools.cs\bin\Debug\NetworkingTools.exe.config
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkingTools.cs\obj\Debug\NetworkingTools.exe
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkingTools.cs\obj\Debug\NetworkingTools.pdb
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkingTools.cs\bin\Debug\NetworkingTools.exe
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkingTools.cs\bin\Debug\NetworkingTools.pdb
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkingTools.cs\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+E:\Piotr\Programowanie\C#\TSST-Project\NetworkEmulation\NetworkingTools.cs\obj\Debug\NetworkingTools.csprojResolveAssemblyReference.cache
+C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkEmulation\NetworkingTools.cs\bin\Debug\NetworkingTools.exe.config
+C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkEmulation\NetworkingTools.cs\bin\Debug\NetworkingTools.exe
+C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkEmulation\NetworkingTools.cs\bin\Debug\NetworkingTools.pdb
+C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkEmulation\NetworkingTools.cs\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkEmulation\NetworkingTools.cs\obj\Debug\NetworkingTools.csprojResolveAssemblyReference.cache
+C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkEmulation\NetworkingTools.cs\obj\Debug\NetworkingTools.exe
+C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkEmulation\NetworkingTools.cs\obj\Debug\NetworkingTools.pdb

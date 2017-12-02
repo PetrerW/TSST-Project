@@ -50,7 +50,7 @@ namespace NetworkCalbleCloud
 
         private static List<string> tableTo = new List<string>();
 
-        // private static List<List<byte[]>> listOfList = new List<List<byte[]>>();
+        private List<Task> tasks = new List<Task>();
 
 
         public static byte[] msg;
@@ -116,7 +116,7 @@ namespace NetworkCalbleCloud
         /// nawiazac polaczenie wychodzace na sokecie wychodzacym
         /// Kazdy sluchac dziala na oddzielnym watku
         /// </remarks>
-        private static void messageHandling()
+        private static async void messageHandling()
         {
             //Zmienna do przechowywania klucza na adres wychodzacy powiazany z socketem sluchaczem
             string settingsString = "";
@@ -134,13 +134,14 @@ namespace NetworkCalbleCloud
                 if (key.Keysettings.StartsWith("Listener"))
                 {
                     //Uruchamiamy watek na kazdym z tworzonych sluchaczy
-                    var task = Task.Run(() =>
+                    var task = Task.Run(async() =>
                     {
 
                         ListenAsync(key.SettingsValue, key.Keysettings);
 
                     });
 
+                  
 
 
                 }
@@ -300,7 +301,7 @@ namespace NetworkCalbleCloud
                             // listByte.Add(msg);
 
                             //Wykonuje jezeli nadal zestawione jest polaczenie
-                            if (socketClient.Connected)
+                            if (socketClient.Connected && msg!=null)
                             {
                                 stateReceivedMessage(msg, socketClient);
                                 //Uzyskanie czestotliwosci zawartej w naglowku- potrzebna do okreslenia ktorym laczem idzie wiadomosc

@@ -53,6 +53,13 @@ namespace NetworkNode
         /// </summary>
         public BorderNodeCommutationTable borderNodeCommutationTable;
 
+        /// <summary>
+        /// Funckja uruchamiajaca agenta zarzadzania.
+        /// </summary>
+        /// <param name="number"></param>
+        /// <param name="commutationTable"></param>
+        /// <param name="borderNodeCommutationTable"></param>
+        /// <param name="eonTable"></param>
         public void Run(string number, ref CommutationTable commutationTable,
              ref BorderNodeCommutationTable borderNodeCommutationTable,
            ref EONTable eonTable)
@@ -68,20 +75,7 @@ namespace NetworkNode
             //pobranie wlasnosci zapisanych w pliku konfiguracyjnym
             tmp = OperationConfiguration.ReadAllSettings(mySettings);
 
-
-            //przeszukanie wszystkich kluczy w liscie 
-
-
-            //Uruchamiamy watek na kazdym z tworzonych sluchaczy
-
-
-            //    CreateConnect("127.0.0.14","1NMS");
             CreateConnect(ConfigurationManager.AppSettings[number + "NMS"], number + "NMS");
-
-
-
-
-
 
             ConsoleKeyInfo cki;
             while (true)
@@ -107,10 +101,6 @@ namespace NetworkNode
             try
             {
                 byte[] bytes = new Byte[128];
-
-
-
-
 
                 string numberOfRouter = key.Substring(0, 1);
 
@@ -140,25 +130,23 @@ namespace NetworkNode
                     {
                         //Dodanie socketu do listy socketow OUT
                         agentSending = sS.ConnectToEndPoint(addressConnectIP);
-
-
+                        if (agentSending == null)
+                        {
+                            Console.WriteLine("agentSending is null");
+                            continue;
+                        }
                         Thread.Sleep(milliseconds);
-
                         SendingNodeIsUpMessage(agentSending, OperationConfiguration.getSetting(settingsString, mySettings), Int16.Parse(numberOfRouter));
-
-
-
 
                         //oczekiwanie na polaczenie
                         socket = listenerAgent.Accept();
 
+                        
+
                         SendingKeepAliveMessage(OperationConfiguration.getSetting(settingsString, mySettings), agentSending);
 
                         Listening = false;
-                        /* LingerOption myOpts = new LingerOption(true, 1);
-                         socketClient.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Linger, myOpts);
-                         socketClient.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger, false);
-                         socketClient.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);*/
+
 
                         Console.WriteLine("Connect on port  " + NetworkNode.takingAddresListenerSocket(socket));
                         byte[] msg;
@@ -172,42 +160,20 @@ namespace NetworkNode
                                 string from = string.Empty;
                                 //Odebranie tablicy bajtow na obslugiwanym w watku sluchaczu
 
-                                msg = sl.ProcessRecivedBytes3(socket);
+                                msg = sl.ProcessRecivedBytes3(socket);                                
+
+                                if (msg == null) { break; };
                                 NMSPackage package = new NMSPackage();
                                 string usableMessage = NMSPackage.extractUsableMessage(msg, NMSPackage.extractUsableInfoLength(msg));
                                 Console.WriteLine(usableMessage);
                                 fillingTable(usableMessage, agentSending, settingsString);
-                                // Package.extractHowManyPackages(msg);
-                                // listByte.Add(msg);
-
-                                //Wykonuje jezeli nadal zestawione jest polaczenie
-
-                                if (msg == null)
-                                {
-                                    //Rozpoczynamy proces nowego polaczenia
-
-                                    break;
-
-
-                                }
-
 
                             }
                         }
 
 
                     }
-                    ConsoleKeyInfo cki;
-                    while (true)
-                    {
-                        cki = Console.ReadKey();
-                        if (cki.Key == ConsoleKey.Escape)
-                        {
 
-
-                            break;
-                        }
-                    }
                 }
             }
             catch (SocketException se)
@@ -232,9 +198,7 @@ namespace NetworkNode
 
             try
             {
-                lock (_syncRoot)
-                {
-
+               
                     // wiadomośc przesyłana do komunikacji z NMSem
                     string message = "Network node is up";
                     short length = (Int16)message.Length;
@@ -246,12 +210,12 @@ namespace NetworkNode
 
                     // Send the data through the socket.  
                     socketout.Send(bytemessage);
-                }
+               
             }
             catch (Exception)
             {
 
-                Console.WriteLine("Lack connection with NMS");
+                Console.WriteLine("Lock connection with NMS");
             }
 
         }
@@ -267,7 +231,7 @@ namespace NetworkNode
                     {
                         if (!socketout.Connected)
                         {
-                            Console.WriteLine("Lack connection NMS");
+                            Console.WriteLine("Lock connection NMS");
                             break;
 
                         }
@@ -292,7 +256,7 @@ namespace NetworkNode
                 catch (Exception err)
                 {
 
-                    Console.WriteLine("Lack of connection with NMS");
+                    Console.WriteLine("Lock connection with NMS");
                 }
 
             });
@@ -494,9 +458,6 @@ namespace NetworkNode
                                 sendingMessageCommunication(OperationConfiguration.getSetting(key, mySettings), builder, socketsending);
 
                             }
-
-
-
                             break;
                         default:
                             break;
@@ -506,18 +467,16 @@ namespace NetworkNode
                     break;
             }
 
-
-
-
             // Console.ReadKey();
         }
         public static void stateReceivedMessageFromNMS(string table, string type)
         {
 
             Console.ForegroundColor = ConsoleColor.Blue;
-            Console.WriteLine("[" + DateTime.Now + "] Message from NMS to {0,8} new registry to table  {1} ", type, table);
+            Console.WriteLine("[" + DateTime.Now + "] Message from NMS {0,8} {1} ", type, table);
             Console.ResetColor();
         }
+
 
         /* public static void stateSendingMessageToNMS( Socket socket)
          {

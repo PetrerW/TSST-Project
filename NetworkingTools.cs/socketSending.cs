@@ -10,9 +10,9 @@ namespace NetworkingTools
 {
     public class SocketSending
     {
-        private IPAddress ipAddress;
-        private IPEndPoint remoteEP;
-        private Socket sendSocket;
+        private  IPAddress ipAddress;
+        private  IPEndPoint remoteEP;
+        private  Socket sendSocket;
         private Object thislock = new object();
 
 
@@ -20,7 +20,7 @@ namespace NetworkingTools
         {
             try
             {
-                lock (thislock)
+                lock(thislock)
                 {
                     ipAddress = IPAddress.Parse(IP);
                     remoteEP = new IPEndPoint(ipAddress, 11000);
