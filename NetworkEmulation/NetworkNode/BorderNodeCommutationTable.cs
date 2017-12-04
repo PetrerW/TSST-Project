@@ -78,7 +78,7 @@ namespace NetworkNode
         /// <param name="IP_IN"></param>
         /// <param name="port_in"></param>
         /// <returns></returns>
-        public BorderNodeCommutationTableRow FindRow(string IP_IN, short port_in, string IP_Destination )
+        public BorderNodeCommutationTableRow FindRow(string IP_IN, short port_in, string IP_Destination)
         {
             //Jeden rzad tablicy komutacji 
             BorderNodeCommutationTableRow borderRow = null;
@@ -134,7 +134,7 @@ namespace NetworkNode
             Package p = new Package(msg);
 
             BorderNodeCommutationTableRow row = new BorderNodeCommutationTableRow();
-            Console.WriteLine("ELO");
+            
             row = this.FindRow(p.IP_Source.ToString(), p.portNumber, p.IP_Destination.ToString());
 
             p.changeBand(row.band);
@@ -144,6 +144,52 @@ namespace NetworkNode
             p.changePort(row.Port);
 
             msg = p.toBytes();
+
+            return msg;
+        }
+
+        /// <summary>
+        /// Funkcja słuząca do zamiany nagłówka, uwzgledniajaca "-1" w czestotliwosci
+        /// </summary>
+        /// <param name="message">Wiadomość odebrana w postaci tablicy bajtów</param>
+        /// <returns></returns>
+        public byte[] changePackageHeader2(byte[] message, ref CommutationField commutationField)
+        {
+            byte[] msg = new byte[64];
+            msg = message;
+            Package p = new Package(msg);
+
+            //Jak czestotliwosc jest rowna -1
+            if(p.frequency == -1)
+            {
+                BorderNodeCommutationTableRow row = new BorderNodeCommutationTableRow();
+
+                row = this.FindRow(p.IP_Source.ToString(), p.portNumber, p.IP_Destination.ToString());
+
+                //Gdy udalo sie znalezc wpis w tabeli, podmien pola naglowka
+                if (row != null)
+                {
+                    p.changeBand(row.band);
+                    p.changeFrequency(row.frequency);
+                    p.changeModulationPerformance(row.modulationPerformance);
+                    p.changeBitRate(row.bitRate);
+                    p.changePort(row.Port);
+                }
+                //Jak sie nie udalo, to wpisz -2 do czestotliwosci
+                else
+                {
+                    //-2 oznacza "upusc pakiet"
+                    p.changeFrequency(-2);
+                }
+
+                msg = p.toBytes();
+            }
+            //Jak nie bylo -1, to odwolujemy sie do tabeli komutacji, ale nie brzegowej
+            else
+            {
+                msg = commutationField.commutationTable.changePackageHeader(msg);
+            }
+
 
             return msg;
         }

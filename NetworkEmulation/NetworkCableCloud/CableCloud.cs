@@ -14,7 +14,7 @@ using System.Net.NetworkInformation;
 namespace NetworkCalbleCloud
 {
 
-  public  class CableCloud
+    public class CableCloud
     {
 
         public delegate Socket SocketDelegate(Socket socket);
@@ -50,7 +50,7 @@ namespace NetworkCalbleCloud
 
         private static List<string> tableTo = new List<string>();
 
-       // private static List<List<byte[]>> listOfList = new List<List<byte[]>>();
+        // private static List<List<byte[]>> listOfList = new List<List<byte[]>>();
 
 
         public static byte[] msg;
@@ -138,7 +138,7 @@ namespace NetworkCalbleCloud
                     {
 
                         ListenAsync(key.SettingsValue, key.Keysettings);
-                      
+
                     });
 
 
@@ -273,7 +273,7 @@ namespace NetworkCalbleCloud
 
                         //Sklejenie czesci wspolnej klucza dla socketu OUT oraz indeksu 
                         string settingsString = "Sending" + str;
-                       
+
                         //Dodanie socketu do listy socketow OUT
                         socketSendingList.Add(sS.ConnectToEndPoint(OperationConfiguration.getSetting(settingsString, readSettings)));
                         Listening = false;
@@ -283,47 +283,51 @@ namespace NetworkCalbleCloud
                         socketClient.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
 
                         Console.WriteLine("Polaczenie na  " + takingAddresListenerSocket(socketClient));
-   
-
-                            string fromAndFrequency;
 
 
-                            //Oczekiwanie w petli na przyjscie danych
-                            while (true)
+                        string fromAndFrequency;
+
+
+                        //Oczekiwanie w petli na przyjscie danych
+                        while (true)
+                        {
+
+                            //Odebranie tablicy bajtow na obslugiwanym w watku sluchaczu
+
+                            msg = sl.ProcessRecivedBytes(socketClient);
+
+                            // Package.extractHowManyPackages(msg);
+                            // listByte.Add(msg);
+
+                            //Wykonuje jezeli nadal zestawione jest polaczenie
+                            if (socketClient.Connected && msg!=null)
                             {
-                                
-                                //Odebranie tablicy bajtow na obslugiwanym w watku sluchaczu
+                                stateReceivedMessage(msg, socketClient);
+                                //Uzyskanie czestotliwosci zawartej w naglowku- potrzebna do okreslenia ktorym laczem idzie wiadomosc
+                                frequency = Package.extractPortNumber(msg);
+                                fromAndFrequency = takingAddresListenerSocket(socketClient) + " " + frequency;
 
-                                msg = sl.ProcessRecivedBytes(socketClient);
-                               // Package.extractHowManyPackages(msg);
-                               // listByte.Add(msg);
-
-                                //Wykonuje jezeli nadal zestawione jest polaczenie
-                                if (socketClient.Connected)
-                                {
-                                    //Uzyskanie czestotliwosci zawartej w naglowku- potrzebna do okreslenia ktorym laczem idzie wiadomosc
-                                    frequency = Package.extractPortNumber(msg);
-                                    fromAndFrequency = takingAddresListenerSocket(socketClient) + " " + frequency;
-
-                                    //wyznaczenie socketu przez ktory wyslana zostanie wiadomosc
-                                    send = sendingThroughSocket(fromAndFrequency);
-
-                                    //wyslanei tablicy bajtow
-                                    sS.SendingPackageBytes(send, msg);
-                                }
-                                else
-                                {
-                                    //Jezeli host zerwie polaczneie to usuwamy go z listy przetrzymywanych socketow, aby rozpoczac proces nowego polaczenia
-                                    int numberRemove = socketListenerList.IndexOf(socketClient);
-                                    socketListenerList.RemoveAt(numberRemove);
-                                    socketSendingList.RemoveAt(numberRemove);
-                                    break;
+                                //wyznaczenie socketu przez ktory wyslana zostanie wiadomosc
+                                send = sendingThroughSocket(fromAndFrequency);
+                                stateSendingMessage(msg, send,fromAndFrequency);
+                                //wyslanei tablicy bajtow
+                                sS.SendingPackageBytes(send, msg);
 
 
-                                }
                             }
-                            Listening = true;
-                       
+                            else
+                            {
+                                //Jezeli host zerwie polaczneie to usuwamy go z listy przetrzymywanych socketow, aby rozpoczac proces nowego polaczenia
+                                int numberRemove = socketListenerList.IndexOf(socketClient);
+                                socketListenerList.RemoveAt(numberRemove);
+                                socketSendingList.RemoveAt(numberRemove);
+                                break;
+
+
+                            }
+                        }
+                        Listening = true;
+
                     }
                 }
             }
@@ -343,6 +347,41 @@ namespace NetworkCalbleCloud
 
             return socketClient;
         }
+
+        public static void stateReceivedMessage(byte[] bytes, Socket socket)
+        {
+            int length = Package.extractUsableMessage(bytes, Package.extractUsableInfoLength(bytes)).Length;
+            short numberOfLink = Package.extractPortNumber(bytes);
+            short ID = Package.extractID(bytes);
+            short messageNumber = Package.extractPackageNumber(bytes);
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("Node on interface " + takingAddresListenerSocket(socket) + " from link number: " + numberOfLink + 
+                " -  {0,2} bytes recieved. Number ID: {1,5}, number of package: " + messageNumber + "/" + Package.extractHowManyPackages(bytes), length, ID);
+            Console.ResetColor();
+        }
+
+        public static void stateSendingMessage(byte[] bytes, Socket socket,string toTable)
+        {
+            if (socket != null)
+            {
+                int length = Package.extractUsableMessage(bytes, Package.extractUsableInfoLength(bytes)).Length;
+                short numberOfLink = Package.extractPortNumber(bytes);
+                short ID = Package.extractID(bytes);
+                short messageNumber = Package.extractPackageNumber(bytes);
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine("Node on interface " + takingAddresSendingSocket(socket) + " on link number: " + numberOfLink +
+                    " -  {0,2} bytes sent. Number ID: {1,5}, number of package: " + messageNumber+"/"+Package.extractHowManyPackages(bytes), length, ID);
+                Console.ResetColor();
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                Console.WriteLine("Node {0} which is next hop is not responding", tableTo.ElementAt(tableFrom.IndexOf(toTable)));
+                Console.ResetColor();
+            }
+
+        }
+
 
 
     }

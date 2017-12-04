@@ -79,7 +79,6 @@ namespace NetworkNode
             return msg;
         }
 
-
         /// <summary>
         /// Funkcja odpowiedzialna za znalezienie wiersza w tablicy komutacji
         /// </summary>

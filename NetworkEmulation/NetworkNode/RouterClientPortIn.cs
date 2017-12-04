@@ -31,8 +31,10 @@ namespace NetworkNode
                 //Numer portu, ktorym przyszedl pakiet od klienta
                 short port_in = Package.extractPortNumber(packageBytes);
 
+                //IP Destination, do ktorego klienta idzie
+                string IPDestionation = Package.exctractDestinationIP(packageBytes).ToString() ;
                 //Odnajduje okreslony rzad
-                var row = table.FindRow(IP_in, port_in);
+                var row = table.FindRow(IP_in, port_in,IPDestionation);
 
                 //Odtworzenie obiektu klasy pakiet 
                 Package P = new Package(packageBytes);

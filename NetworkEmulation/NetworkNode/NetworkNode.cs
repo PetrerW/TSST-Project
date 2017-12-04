@@ -11,6 +11,7 @@ using System.Collections.Specialized;
 using System.Configuration;
 using System.Threading;
 using System.Net.NetworkInformation;
+using System.Diagnostics;
 
 namespace NetworkNode
 {
@@ -81,11 +82,26 @@ namespace NetworkNode
         /// <summary>
         /// Pole komutacyjne wraz z buforami wejsciowym i wyjsciowymi.
         /// </summary>
-        public CommutationField commutationField;
+        public volatile CommutationField commutationField;
 
         private OperationConfiguration oc = new OperationConfiguration();
 
         public static object ConfigurationManager { get; private set; }
+
+        /// <summary>
+        /// Czy mozna wyczyscic bufory?
+        /// </summary>
+        public volatile bool canIClearMyBuffers = false;
+
+        /// <summary>
+        /// Czy mozna zerowac licznik?
+        /// </summary>
+        public volatile bool zeroTimer = false;
+
+        /// <summary>
+        /// Czy mozna komutowac pakiety?
+        /// </summary>
+        public volatile bool canICommutePackets;
 
         public NetworkNode()
         {
@@ -129,7 +145,7 @@ namespace NetworkNode
             numberOfRouter = Console.ReadLine().ToString();
 
 
-
+            //Uruchomienie agenta
             ManagmentAgent agent = new ManagmentAgent();
             Task.Run(() => agent.Run(numberOfRouter, ref commutationTable, ref borderNodeCommutationTable, ref eonTable));
 
@@ -145,12 +161,7 @@ namespace NetworkNode
                 {
                     //Uruchamiamy watek na kazdym z tworzonych sluchaczy
                     //Task.Run(()=>
-                    CreateConnect(key.SettingsValue, key.Keysettings);//);
-
-
-
-
-
+                    CreateConnect2(key.SettingsValue, key.Keysettings);//);
                 }
             }
             /*  //jezeli klucz zaczyna sie od TableFrom to uzupelniamy liste
@@ -168,7 +179,6 @@ namespace NetworkNode
                 cki = Console.ReadKey();
                 if (cki.Key == ConsoleKey.Escape)
                 {
-
                     _cts.Cancel();
                     break;
                 }
@@ -177,15 +187,408 @@ namespace NetworkNode
 
         }
 
+        /// <summary>
+        /// Zeby zuzycie procesora nie bylo 95% jak uruchamiam wezly sieciowe, 
+        /// to niech kazdy task w petli while czeka czas podany na argumencie.
+        /// </summary>
+        /// <param name="time"></param>
+        /// <returns></returns>
+        public async Task<bool> waitABit(int time)
+        {
+            //Czekamy iles tam czasu
+            await Task.Delay(time);
+            //zwracamy prawde - mozesz kontynuowac tasku
+            return true;
+        }
+
+        /// <summary>
+        /// Odbieranie wiadomosci
+        /// </summary>
+        /// <param name="socketClient"></param>
+        public async Task receiveMessage(Socket socketClient)
+        {
+            bool canIContinue = true;
+            byte[] msg;
+            while (Listening && canIContinue)
+            {
+
+                //czekamy iles milisekund
+                canIContinue = await waitABit(300);
+
+                Console.WriteLine("receiveMessage()");
+
+                if (canIContinue)
+                {
+                    //Odebranie tablicy bajtow na obslugiwanym w watku sluchaczu
+                    msg = sl.ProcessRecivedBytes(socketClient);
+
+                    if (msg != null)
+                    {
+                        //Gdy przyszla jakas wiadomosc, mozna zaczac komutowac pakiety
+                        canICommutePackets = true;
+
+                        //wyswietlenie informacji na konsoli
+                        Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" +
+                                          " (receiveMessage)canICommutePackets= " + canICommutePackets);
+
+                        stateReceivedMessageFromCableCloud(msg, socketClient);
+
+                        if (commutationField.bufferIn.queue.Count >= commutationField.maxBuffInSize)
+                        {
+                            //Stary kolor konsoli
+                            var color = Console.ForegroundColor;
+
+                            //Ustawienie nowego koloru konsoli
+                            Console.ForegroundColor = ConsoleColor.Cyan;
+
+                            Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" +
+                                              "(receiveMessage) Dropped package " +
+                                              Package.extractID(msg) +
+                                              " number " + Package.extractPackageNumber(msg) + " of " +
+                                              Package.extractHowManyPackages(msg));
+
+                            //Przywrocenie starego koloru konsoli
+                            Console.ForegroundColor = color;
+                        }
+                        else
+                        {
+                            //Dodanie do bufora wejsciowego wiadomosci, ktora przyszla
+                            commutationField.bufferIn.queue.Enqueue(msg);
+
+                            Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" +
+                                              " Package enqueued to the IN buffer (buffer size = " +
+                                              commutationField.bufferIn.queue.Count + ") " + Package.extractID(msg) +
+                                              " number " + Package.extractPackageNumber(msg) + " of " +
+                                              Package.extractHowManyPackages(msg));
+
+                        }
+                    }
+
+                }
+
+            }
+        }
+
+        /// <summary>
+        /// Zdejmowanie pakietu z bufora wejsciowego, zmienianie jego pól, wpisywanie do bufora wyjsciowego
+        /// </summary>
+        public async Task commutePackets()
+        {
+            bool canIContinue = true;
+
+            while (canIContinue)
+            {
+                if (canICommutePackets)
+                {
+                    //czekamy iles milisekund
+                    canIContinue = await waitABit(300);
+
+                    //wyswietlenie informacji na konsoli
+                    Console.WriteLine("commutePackets()");
+
+                    //Jak jest niepusty bufor wejsciowy
+                    if (commutationField.bufferIn.queue.Count != 0)
+                    {
+                        //Zdjecie pakietu z bufora wejsciowego
+                        var temp = commutationField.bufferIn.queue.Dequeue();
+
+                        //wyswietlenie informacji na konsoli
+                        Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" + " Package dequeued from the IN buffer (buffer size = " +
+                                          commutationField.bufferIn.queue.Count + ") " + Package.extractID(temp) +
+                                          " number " + Package.extractPackageNumber(temp) + " of " + Package.extractHowManyPackages(temp));
+
+                        //Podmiana naglowkow
+                        temp = borderNodeCommutationTable.changePackageHeader2(temp, ref commutationField);
+
+                        //Wywalamy pakiet bo nie wiadomo dokad ma isc.
+                        if (Package.extractFrequency(temp) == -2)
+                        {
+                            //Stary kolor konsoli
+                            var color = Console.ForegroundColor;
+
+                            //Ustawienie nowego koloru konsoli
+                            Console.ForegroundColor = ConsoleColor.Cyan;
+
+                            //Wyswietlenie wiadomosci o upuszczeniu pakietu
+                            Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" + " Dropped package " +
+                                              Package.extractID(temp) +
+                                              " number " + Package.extractPackageNumber(temp) + " of " +
+                                              Package.extractHowManyPackages(temp));
+                            //Przywrocenie starego koloru konsoli
+                            Console.ForegroundColor = color;
+
+                            //Po prostu nie dodajemy pakietu do bufora
+                        }
+                        else
+                        {
+                            if (commutationField.BuffersOut[0].queue.Count >= commutationField.maxBuffOutSize)
+                            {
+                                //Stary kolor konsoli
+                                var color = Console.ForegroundColor;
+
+                                //Ustawienie nowego koloru konsoli
+                                Console.ForegroundColor = ConsoleColor.Cyan;
+
+                                Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" +
+                                                  "(commutePackets) . Buffer OUT is full! Dropped package " +
+                                                  Package.extractID(msg) +
+                                                  " number " + Package.extractPackageNumber(msg) + " of " +
+                                                  Package.extractHowManyPackages(msg));
+
+                                //Przywrocenie starego koloru konsoli
+                                Console.ForegroundColor = color;
+                            }
+                            else
+                            {
+                                //Dodanie podmienionego naglowka do kolejki wyjsciowej (od [0] bo to na razie lista)
+                                commutationField.BuffersOut[0].queue.Enqueue(temp);
+
+                                //Wyswietlenie informaji na ekranie
+                                Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" + " Package added to the OUT buffer (buffer size = " +
+                                                  commutationField.BuffersOut[0].queue.Count + ") " + Package.extractID(temp) +
+                                                  " number " + Package.extractPackageNumber(temp) + " of " + Package.extractHowManyPackages(temp));
+
+                            }
+
+                        }
+                    }
+
+                    //Gdy bufor wejsciowy jest pusty, to nie mozesz dalej komutowac
+                    if (commutationField.bufferIn.queue.Count == 0)
+                        canICommutePackets = false;
+                    //W przeciwnym razie komutuj dalej!
+                    else
+                        canICommutePackets = true;
+
+                    //wyswietlenie informacji na konsoli
+                    Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" +
+                                      " (commutePackets)canICommutePackets = " + canICommutePackets);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Zdejmowanie pakietu z bufora wyjsciowego i wysylanie go (jezeli uplynie timeout lub bufor jest pelny)
+        /// </summary>
+        /// <param name="send"></param>
+        public async Task sendPackage(Socket send)
+        {
+
+            //Gdy bufory sa puste, to nie kontynuujemy
+            bool canIContinue = true;
+
+            while (true)
+            {
+                //czekamy iles milisekund
+                canIContinue = await waitABit(300);
+
+                Console.WriteLine("sendPackage()");
+
+                if (commutationField.BuffersOut[0].queue.Count != 0)
+                {
+                    //Jezeli rozmiar bufora osiagnal maksimum lub timer pozwolil na oproznienie buforow
+                    if (commutationField.BuffersOut[0].queue.Count == commutationField.maxBuffOutSize
+                        || canIClearMyBuffers)
+                    {
+                        //kolejka jest pusta
+                        if (commutationField.BuffersOut[0].queue.Count == 0)
+                        {
+                            //wyswietlenie informacji na konsoli
+                            Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" + " Empty OUT buffer!");
+                            break;
+                        }
+
+
+                        //Dopoki kolejka nie jest pusta
+                        while (commutationField.BuffersOut[0].queue.Count > 0)
+                        {
+                            //zdjecie pakietu z kolejki wyjsciowej
+                            var tmp = commutationField.BuffersOut[0].queue.Dequeue();
+
+                            //wyswietlenie informacji na konsoli
+                            Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" + " Package dequeued from OUT buffer (buffer size = " +
+                                              commutationField.BuffersOut[0].queue.Count + ") " + Package.extractID(tmp) +
+                                              " number " + Package.extractPackageNumber(tmp) + " of " + Package.extractHowManyPackages(tmp));
+
+                            //Wypisanie informacji na ekran o wyslaniu pakietu
+                            stateSendingMessageToCableCloud(tmp, send);
+
+                            //Zdjecie z kolejki pakietu i wyslanie go
+                            sS.SendingPackageBytes(send, tmp);
+                        }
+
+                        //mozna wyzerowac licznik
+                        zeroTimer = true;
+
+                        //wyswietlenie informacji na konsoli
+                        Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" +
+                                          " (sendPackage)zeroTimer = " + zeroTimer);
+
+                        //nie mozna czyscic buforow wyjsciowych
+                        canIClearMyBuffers = false;
+
+                        //wyswietlenie informacji na konsoli
+                        Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" +
+                                          " (sendPackage)canIClearMyBuffers = " + canIClearMyBuffers);
+                    }
+                }
+
+            }
+        }
+
+        /// <summary>
+        /// Timer, ustalajacy pole canIClearBuffers dla wysylania pakietow
+        /// </summary>
+        public async Task timer()
+        {
+            Stopwatch sw = Stopwatch.StartNew();
+            while (true)
+            {
+                //stary kolor
+                var color = Console.ForegroundColor;
+
+                if (zeroTimer == true)
+                {
+                    //zmiana koloru konsoli
+                    Console.ForegroundColor = ConsoleColor.Green;
+
+                    sw = Stopwatch.StartNew();
+                    canIClearMyBuffers = false;
+
+                    //wyswietlenie informacji na konsoli
+                    Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" +
+                                      " (timer)canIClearMyBuffers = " + canIClearMyBuffers);
+
+                    zeroTimer = false;
+
+                    //wyswietlenie informacji na konsoli
+                    Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" +
+                                      " (timer)zeroTimer = " + zeroTimer);
+                }
+
+                var wait = await Task.Run(async () =>
+                {
+                    int miliseconds = 5000;
+                    //Czekaj iles milisekund
+                    await Task.Delay(miliseconds);
+
+                    //zmiana koloru konsoli
+                    Console.ForegroundColor = ConsoleColor.Green;
+
+                    Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ] Timer waits " + miliseconds + "ms...");
+
+                    sw.Stop();
+                    return sw.ElapsedMilliseconds;
+                });
+
+                //zmiana koloru konsoli
+                Console.ForegroundColor = ConsoleColor.Green;
+
+                //Gdy bufor wyjsciowy ma w sobie pakiety
+                if (commutationField.BuffersOut[0].queue.Count > 0)
+                    canIClearMyBuffers = true;
+                else
+                    canIClearMyBuffers = false;
+
+                //wyswietlenie informacji na konsoli
+                Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" +
+                                  " (timer)canIClearMyBuffers = " + canIClearMyBuffers);
+
+                //Przywrocenie starego koloru konsoli
+                Console.ForegroundColor = color;
+            }
+        }
+
+        public async void CreateConnect2(string addressConnectIP, string key,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            Socket socketClient = null;
+            Socket listener = null;
+            Socket socketSender = null;
+
+            //Znajac dlugosc slowa "Sending" pobieram z calej nazwy klucza tylko index, ktory wykorzystam aby dopasowac do socketu IN
+            ///1-Router
+            ///2-Client
+            ///3-NMS
+            string typeOfSocket = key.Substring(8, key.Length - 8);
+            string numberOfRouter = key.Substring(0, 1);
+
+            //Sklejenie czesci wspolnej klucza dla socketu OUT oraz indeksu 
+            string settingsString = numberOfRouter + "Listener" + typeOfSocket;
+
+            IPAddress ipAddress =
+                ipAddress = IPAddress.Parse(OperationConfiguration.getSetting(settingsString, mySettings));
+            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);
+
+            // Create a TCP/IP socket.  
+            listener = new Socket(ipAddress.AddressFamily,
+                SocketType.Stream, ProtocolType.Tcp);
+
+            if (!listener.IsBound)
+            {
+                //zabindowanie na sokecie punktu koncowego
+                listener.Bind(localEndPoint);
+                listener.Listen(100);
+            }
+
+            //Dodanie socketu do listy socketow OUT
+            socketSendingList.Add(sS.ConnectToEndPoint(addressConnectIP));
+            //oczekiwanie na polaczenie
+            socketClient = listener.Accept();
+            //dodanie do listy sluchaczy po przez delegata
+            socketListenerList.Add(socketClient);
+
+            Listening = true;
+
+            string tmp = string.Empty;
+            //wyznaczenie socketu przez ktory wyslana zostanie wiadomosc
+            if (numberOfRouter == "1")
+            {
+                tmp = "127.0.0.12";
+
+            }
+            else if (numberOfRouter == "2")
+            {
+                tmp = "127.0.0.10";
+
+            }
+            else if (numberOfRouter == "3")
+            {
+                tmp = "127.0.0.8";
+
+            }
+
+            //Ustalenie socketa wysylajacego
+            foreach (var socket in socketSendingList)
+            {
+                //zwracamy socket jeśli host z ktorym sie laczy spelnia warunek zgodnosci adresow z wynikiem kierowania lacza
+                if (takingAddresSendingSocket(socket) == tmp)
+                {
+                    //Socket wysylajacy
+                    socketSender = socket;
+                }
+            }
+
+            //Uruchomienie timera
+            Task.Run(async () =>await timer());
+
+            //Uruchomienie sluchania i wypelniania bufora
+            Task.Run(async () =>await receiveMessage(socketClient));
+
+            //Uruchomione zdejmowanie z bufora wejsciowego, podmiana naglowkow, wrzucenie do bufora wyjsciowego
+            Task.Run(async () =>await commutePackets());
+
+            //Uruchomione oproznianie bufora wyjsciowego (po timeoucie lub wypelnieniu bufora) i wysylanie pakietow
+            Task.Run(async () =>await sendPackage(socketSender)).Wait();
+
+        }
 
 
         /// <summary>
-
-
         /// </summary>      
         /// <param name="adresIPListener">Parametrem jest adres IP na ktorym nasluchujemy  </param>
         ///  /// <param name="key">Parametrem jest warotsc klucza wlasnosci z pliku config  </param>
-        public async void CreateConnect(string addressConnectIP, string key, CancellationToken cancellationToken = default(CancellationToken))
+        public void CreateConnect(string addressConnectIP, string key, CancellationToken cancellationToken = default(CancellationToken))
         {
             Socket socketClient = null;
             Socket listener = null;
@@ -196,6 +599,29 @@ namespace NetworkNode
                 byte[] bytes = new Byte[128];
 
 
+                Task.Run(async () =>
+                {
+                    Stopwatch sw = Stopwatch.StartNew();
+                    while (true)
+                    {
+                        if (zeroTimer == true)
+                        {
+                            sw = Stopwatch.StartNew();
+                            canIClearMyBuffers = false;
+                            zeroTimer = false;
+                        }
+
+                        var wait = await Task.Run(async () =>
+                        {
+                            await Task.Delay(500);
+                            sw.Stop();
+                            return sw.ElapsedMilliseconds;
+                        });
+
+                        canIClearMyBuffers = true;
+
+                    }
+                });
 
                 //Znajac dlugosc slowa "Sending" pobieram z calej nazwy klucza tylko index, ktory wykorzystam aby dopasowac do socketu IN
                 ///1-Router
@@ -222,6 +648,8 @@ namespace NetworkNode
                     listener.Listen(100);
                 }
 
+
+
                 //Nasluchujemy bez przerwy
                 while (Last)
                 {
@@ -237,14 +665,24 @@ namespace NetworkNode
                         Socket send = null;
 
                         Listening = false;
-                        /* LingerOption myOpts = new LingerOption(true, 1);
-                         socketClient.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Linger, myOpts);
-                         socketClient.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger, false);
-                         socketClient.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);*/
 
-                        Console.WriteLine("Polaczenie na  " + takingAddresListenerSocket(socketClient));
+                        string tmp = string.Empty;
+                        //wyznaczenie socketu przez ktory wyslana zostanie wiadomosc
+                        if (numberOfRouter == "1")
+                        {
+                            tmp = "127.0.0.12";
 
+                        }
+                        else if (numberOfRouter == "2")
+                        {
+                            tmp = "127.0.0.10";
 
+                        }
+                        else if (numberOfRouter == "3")
+                        {
+                            tmp = "127.0.0.8";
+
+                        }
 
                         //Oczekiwanie w petli na przyjscie danych
                         while (true)
@@ -254,6 +692,8 @@ namespace NetworkNode
                             //Odebranie tablicy bajtow na obslugiwanym w watku sluchaczu
 
                             msg = sl.ProcessRecivedBytes(socketClient);
+                            stateReceivedMessageFromCableCloud(msg, socketClient);
+
                             // Package.extractHowManyPackages(msg);
                             // listByte.Add(msg);
 
@@ -265,26 +705,6 @@ namespace NetworkNode
                                 from = takingAddresListenerSocket(socketClient) + " " + portNumber;
                                 Package p = new Package(msg);
 
-
-
-                                string tmp = string.Empty;
-                                //wyznaczenie socketu przez ktory wyslana zostanie wiadomosc
-                                if (numberOfRouter == "1")
-                                {
-                                    tmp = "127.0.0.12";
-                                  
-                                }
-                                else if (numberOfRouter == "2")
-                                {
-                                    tmp = "127.0.0.10";
-                                    
-                                }
-                                else if (numberOfRouter == "3")
-                                {
-                                    tmp = "127.0.0.8";
-                                   
-                                }
-
                                 foreach (var socket in socketSendingList)
                                 {
                                     //zwracamy socket jeśli host z ktorym sie laczy spelnia warunek zgodnosci adresow z wynikiem kierowania lacza
@@ -294,13 +714,40 @@ namespace NetworkNode
                                     }
 
                                 }
+
+                                //Dodanie wiadomosci do bufora wejsciowego
+                                commutationField.bufferIn.queue.Enqueue(msg);
+
+
+
+                                //TODO:===================================================================================================================
+
                                 List<Queue<byte[]>> listOfQueue = new List<Queue<byte[]>>();
                                 List<Queue<byte[]>> listOfQueues = commutationField.processPackage(msg);
 
                                 //Jak zwrocila null to jeszcze bufor nie jest pelny
                                 if (listOfQueues == null)
+                                {
+                                    /* if (canIClearMyBuffers == true)
+                                     {
+                                         byte[] tempBufferIn;
+                                         for (int z = 0; z < commutationField.bufferIn.queue.Count; z++)
+                                         {
+                                             while (commutationField.bufferIn.queue.Count > 0)
+                                             {
+                                                 tempBufferIn = commutationField.bufferIn.queue.Dequeue();
+                                                 byte[] obytes = commutationField.borderNodeCommutationTable.changePackageHeader2(tempBufferIn, ref commutationField);
+
+                                                 stateSendingMessageToCableCloud(obytes, send);
+                                                 sS.SendingPackageBytes(send, obytes);
+                                             }
+                                         }
+                                         canIClearMyBuffers = false;
+                                         zeroTimer = true;
+
+                                     }*/
                                     continue;
-                                //w przeciwnym razie zwraca nam liste kolejek
+                                }//w przeciwnym razie zwraca nam liste kolejek
                                 else
                                 {
                                     for (int i = 0; i < listOfQueues.Count; i++)
@@ -311,18 +758,19 @@ namespace NetworkNode
                                             //Element z listy kolejek moze byc nullem
                                             if (listOfQueues[i].Count != 0)
                                             {
+
+                                                stateSendingMessageToCableCloud(listOfQueues[i].Peek(), send);
                                                 //Zdjecie z kolejki pakietu i wyslanie go
                                                 sS.SendingPackageBytes(send, listOfQueues[i].Dequeue());
+
                                             }
                                             //A jak jest nullem to nic nie robimy
                                         }
                                     }
                                 }
 
+                                //TODO:===================================================================================================================
 
-                                /* msg = p.toBytes();
-                                 //wyslanei tablicy bajtow
-                                 sS.SendingPackageBytes(send, msg);*/
                             }
                             else
                             {
@@ -356,5 +804,42 @@ namespace NetworkNode
 
         }
         public NameValueCollection getAppSetting { get { return mySettings; } }
+
+
+        public static void stateReceivedMessageFromCableCloud(byte[] bytes, Socket socket)
+        {
+            if (bytes != null)
+            {
+                int length = Package.extractUsableMessage(bytes, Package.extractUsableInfoLength(bytes)).Length;
+                short numberOfLink = Package.extractPortNumber(bytes);
+                short ID = Package.extractID(bytes);
+                short messageNumber = Package.extractPackageNumber(bytes);
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ] Message about ID: {0,5} and number of package {1,2} / " + Package.extractHowManyPackages(bytes) + " received on port: " + numberOfLink, ID, messageNumber);
+                Console.ResetColor();
+            }
+        }
+
+
+        public static void stateSendingMessageToCableCloud(byte[] bytes, Socket socket)
+        {
+            if (socket != null)
+            {
+                int length = Package.extractUsableMessage(bytes, Package.extractUsableInfoLength(bytes)).Length;
+                short numberOfLink = Package.extractPortNumber(bytes);
+                short ID = Package.extractID(bytes);
+                short messageNumber = Package.extractPackageNumber(bytes);
+                Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ] Message about ID: {0,5} and number of package {1,2} / " + Package.extractHowManyPackages(bytes) + " sent on port: " + numberOfLink, ID, messageNumber);
+                Console.ResetColor();
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine("CableCloud is not responding - link is not available");
+                Console.ResetColor();
+            }
+
+        }
     }
 }

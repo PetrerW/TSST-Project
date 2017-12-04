@@ -23,7 +23,7 @@ namespace NetworkNode
 
         public Buffer()
         {
-            bufferSize = 2;
+            bufferSize = 20;
 
             //Wielkosc pakietu
             int packageSize = Package.headerMaxLength + Package.usableInfoMaxLength;

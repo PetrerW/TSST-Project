@@ -14,10 +14,10 @@ namespace NetworkNode
     public class CommutationField
     {
         //Maksymalny rozmiar bufora wejsciowego
-        public short maxBuffInSize = 2;
+        public short maxBuffInSize = 20;
 
         //Maksymalny rozmiar bufora wyjsciowego
-        public short maxBuffOutSize = 2;
+        public short maxBuffOutSize = 20;
 
         //Bufor wejsciowy
         public volatile Buffer bufferIn;
@@ -142,7 +142,7 @@ namespace NetworkNode
 
                         listOfQueues[i] = new Queue<byte[]>(borderNodeCommutationTable.changeHeaderForMessagesFromClient(
                                     (copyList[i])));
-                       
+
                         //Nowa, zmieniona czestotliwosc. 
                         //TODO: Na razie jest jedna, a na drugi etap trzeba bedzie przygotowac sortowanie, dzielenie i 
                         //TODO: dodawanie do konkretnych kolejek
@@ -281,15 +281,15 @@ namespace NetworkNode
 
 
                     //Jesli pakiety maja -1 w czestotliwosciach
-                   // if (Package.extractFrequency(joinedQueue.Peek()) == 1)
-                  //  {
-                        //TODO: To jest wpisane z palca na razie, ale potem trzeba bedzie zrobic tak:
-                        //joinedQueue = new Queue<byte[]>( borderNodeCommutationTable.changeHeaderForMessagesFromClient(joinedQueue));
-                     //   Package P = new Package(joinedQueue.Dequeue());
-                      //  P.changeFrequency(-1);
-                      //  P.changePort(3);
-                       // joinedQueue.Enqueue(P.toBytes());
-                  //  }
+                    // if (Package.extractFrequency(joinedQueue.Peek()) == 1)
+                    //  {
+                    //TODO: To jest wpisane z palca na razie, ale potem trzeba bedzie zrobic tak:
+                    //joinedQueue = new Queue<byte[]>( borderNodeCommutationTable.changeHeaderForMessagesFromClient(joinedQueue));
+                    //   Package P = new Package(joinedQueue.Dequeue());
+                    //  P.changeFrequency(-1);
+                    //  P.changePort(3);
+                    // joinedQueue.Enqueue(P.toBytes());
+                    //  }
 
                     //Wpisanie naglowkow do kolejki z pakietami czestotliwosci i portu wyjsciowego. 
                     //Chmurka juz bedzie wiedziala, jak pokierowac pakiety z tej kolejki.
@@ -301,7 +301,7 @@ namespace NetworkNode
                 }
 
                 //TIMER
-
+                /*
                 //Task, który służy wprowadzeniu opóźnienia między kolejnymi wysłanymi pakietami
                 var delay = Task.Run(async () =>
                {
@@ -310,7 +310,7 @@ namespace NetworkNode
                    sw.Stop();
                    return sw.ElapsedMilliseconds;
                });
-
+               */
                 //Po odczekaniu tego czasu wyprozniamy bufory.
                 for (int i = 0; i < BuffersOut.Count; i++)
                 {
@@ -326,8 +326,18 @@ namespace NetworkNode
             //Jak bufor wejsciowy nie jest przepelniony
             else
             {
+                byte[] msg = new byte[64];
+                msg = packageBytes;
+                Package p = new Package(msg);
+
+
+                BorderNodeCommutationTableRow borderRow = null;
+                borderRow = borderNodeCommutationTable.Table.Find(rowe => (rowe.IP_IN.ToString() == p.IP_Source.ToString() && (rowe.port_in == p.portNumber) && (rowe.IP_Destination.ToString() == p.IP_Destination.ToString())));
                 //dodanie do bufora pakietu
-                bufferIn.queue.Enqueue(packageBytes);
+                if (borderRow != null)
+                {
+                    bufferIn.queue.Enqueue(packageBytes);
+                }
                 return null;
             }
         }

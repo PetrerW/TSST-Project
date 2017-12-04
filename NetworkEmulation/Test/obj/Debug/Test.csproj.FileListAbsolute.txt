@@ -44,14 +44,3 @@ E:\SEMESTR 5\TSST\NetworkEmulation\Test\bin\Debug\NetworkingTools.pdb
 E:\SEMESTR 5\TSST\NetworkEmulation\Test\obj\Debug\Test.csprojResolveAssemblyReference.cache
 E:\SEMESTR 5\TSST\NetworkEmulation\Test\obj\Debug\Test.exe
 E:\SEMESTR 5\TSST\NetworkEmulation\Test\obj\Debug\Test.pdb
-C:\Users\Damian\Desktop\NetworkEmulationODPAWŁA\NetworkEmulation\Test\bin\Debug\Test.exe.config
-C:\Users\Damian\Desktop\NetworkEmulationODPAWŁA\NetworkEmulation\Test\obj\Debug\Test.exe
-C:\Users\Damian\Desktop\NetworkEmulationODPAWŁA\NetworkEmulation\Test\obj\Debug\Test.pdb
-C:\Users\Damian\Desktop\NetworkEmulationODPAWŁA\NetworkEmulation\Test\bin\Debug\Test.exe
-C:\Users\Damian\Desktop\NetworkEmulationODPAWŁA\NetworkEmulation\Test\bin\Debug\Test.pdb
-C:\Users\Damian\Desktop\NetworkEmulationODPAWŁA\NetworkEmulation\Test\bin\Debug\ClientNode.exe
-C:\Users\Damian\Desktop\NetworkEmulationODPAWŁA\NetworkEmulation\Test\bin\Debug\NetworkingTools.exe
-C:\Users\Damian\Desktop\NetworkEmulationODPAWŁA\NetworkEmulation\Test\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
-C:\Users\Damian\Desktop\NetworkEmulationODPAWŁA\NetworkEmulation\Test\bin\Debug\ClientNode.pdb
-C:\Users\Damian\Desktop\NetworkEmulationODPAWŁA\NetworkEmulation\Test\bin\Debug\NetworkingTools.pdb
-C:\Users\Damian\Desktop\NetworkEmulationODPAWŁA\NetworkEmulation\Test\obj\Debug\Test.csprojResolveAssemblyReference.cache
