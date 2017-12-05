@@ -103,42 +103,6 @@ namespace NetworkNode
         /// </summary>
         public volatile bool canICommutePackets;
 
-        public  bool CanICommutePackets
-        {
-            get { return canICommutePackets; }
-            set { this.canICommutePackets = value;
-                if (canICommutePackets == true)
-                {
-                    Task.Run(() =>
-                    {
-                        commutePackets();
-
-
-                    });
-                }
-            }
-
-        }
-
-        public bool CanIClearMyBuffers
-        {
-            get { return canIClearMyBuffers; }
-            set
-            {
-                this.canIClearMyBuffers = value;
-                if (canIClearMyBuffers == true)
-                {
-                    Task.Run(() =>
-                    {
-                        sendPackage(socketSendingList[0]);
-
-
-                    });
-                }
-            }
-
-        }
-
         public NetworkNode()
         {
             this.commutationTable = new CommutationTable();
@@ -248,9 +212,10 @@ namespace NetworkNode
             while (Listening && canIContinue)
             {
 
-              
+                //czekamy iles milisekund
+                canIContinue = await waitABit(100);
 
-                Console.WriteLine("receiveMessage()");
+                //Console.WriteLine("receiveMessage()");
 
                 if (canIContinue)
                 {
@@ -260,16 +225,17 @@ namespace NetworkNode
                     if (msg != null)
                     {
                         //Gdy przyszla jakas wiadomosc, mozna zaczac komutowac pakiety
-                        
+                        canICommutePackets = true;
 
                         //wyswietlenie informacji na konsoli
-                        Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" +
-                                          " (receiveMessage)canICommutePackets= " + CanICommutePackets);
+                        //Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" +
+                          //                " (receiveMessage)canICommutePackets= " + canICommutePackets);
 
                         stateReceivedMessageFromCableCloud(msg, socketClient);
 
                         if (commutationField.bufferIn.queue.Count >= commutationField.maxBuffInSize)
                         {
+                            //canICommutePackets = true;
                             //Stary kolor konsoli
                             var color = Console.ForegroundColor;
 
@@ -284,12 +250,12 @@ namespace NetworkNode
 
                             //Przywrocenie starego koloru konsoli
                             Console.ForegroundColor = color;
-                            canICommutePackets = true;
                         }
                         else
                         {
                             //Dodanie do bufora wejsciowego wiadomosci, ktora przyszla
                             commutationField.bufferIn.queue.Enqueue(msg);
+                            //canICommutePackets = true;
 
                             Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" +
                                               " Package enqueued to the IN buffer (buffer size = " +
@@ -297,12 +263,11 @@ namespace NetworkNode
                                               " number " + Package.extractPackageNumber(msg) + " of " +
                                               Package.extractHowManyPackages(msg));
 
-                            CanICommutePackets = true;
-
                         }
                     }
                     else
                     {
+
                         break;
                     }
 
@@ -316,16 +281,17 @@ namespace NetworkNode
         /// </summary>
         public async Task commutePackets()
         {
-            //  bool canIContinue = true;
+            bool canIContinue = true;
 
-            while (commutationField.bufferIn.queue.Count != 0)
+            while (canIContinue)
             {
-                if (CanICommutePackets)
+                if (commutationField.bufferIn.queue.Count != 0)
                 {
-
+                    //czekamy iles milisekund
+                    canIContinue = await waitABit(100);
 
                     //wyswietlenie informacji na konsoli
-                    Console.WriteLine("commutePackets()");
+                    //Console.WriteLine("commutePackets()");
 
                     //Jak jest niepusty bufor wejsciowy
                     if (commutationField.bufferIn.queue.Count != 0)
@@ -338,12 +304,17 @@ namespace NetworkNode
                                           commutationField.bufferIn.queue.Count + ") " + Package.extractID(temp) +
                                           " number " + Package.extractPackageNumber(temp) + " of " + Package.extractHowManyPackages(temp));
 
+                        short ID = Package.extractID(temp);
+                        short packageNumber = Package.extractPackageNumber(temp);
+                        short howManyPackages = Package.extractHowManyPackages(temp);
                         //Podmiana naglowkow
-                        temp = borderNodeCommutationTable.changePackageHeader2(temp, ref commutationField);
 
-                        //Wywalamy pakiet bo nie wiadomo dokad ma isc.
-                        if (Package.extractFrequency(temp) == -2)
+                        temp = borderNodeCommutationTable.changePackageHeader2(temp, ref commutationField);
+                       
+
+                        if (temp == null)
                         {
+
                             //Stary kolor konsoli
                             var color = Console.ForegroundColor;
 
@@ -352,17 +323,19 @@ namespace NetworkNode
 
                             //Wyswietlenie wiadomosci o upuszczeniu pakietu
                             Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" + " Dropped package " +
-                                              Package.extractID(temp) +
-                                              " number " + Package.extractPackageNumber(temp) + " of " +
-                                              Package.extractHowManyPackages(temp));
+                                             ID + " number " + packageNumber + " of " +
+                                              howManyPackages);
                             //Przywrocenie starego koloru konsoli
                             Console.ForegroundColor = color;
 
                             //Po prostu nie dodajemy pakietu do bufora
+
                         }
                         else
                         {
-                            if (commutationField.BuffersOut[0].queue.Count >= commutationField.maxBuffOutSize)
+
+                            //Wywalamy pakiet bo nie wiadomo dokad ma isc.
+                            if (Package.extractFrequency(temp) == -2)
                             {
                                 //Stary kolor konsoli
                                 var color = Console.ForegroundColor;
@@ -370,46 +343,63 @@ namespace NetworkNode
                                 //Ustawienie nowego koloru konsoli
                                 Console.ForegroundColor = ConsoleColor.Cyan;
 
-                                Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" +
-                                                  "(commutePackets) . Buffer OUT is full! Dropped package " +
-                                                  Package.extractID(msg) +
-                                                  " number " + Package.extractPackageNumber(msg) + " of " +
-                                                  Package.extractHowManyPackages(msg));
-
+                                //Wyswietlenie wiadomosci o upuszczeniu pakietu
+                                Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" + " Dropped package " +
+                                                  Package.extractID(temp) +
+                                                  " number " + Package.extractPackageNumber(temp) + " of " +
+                                                  Package.extractHowManyPackages(temp));
                                 //Przywrocenie starego koloru konsoli
                                 Console.ForegroundColor = color;
-                                CanIClearMyBuffers = true;
 
+                                //Po prostu nie dodajemy pakietu do bufora
                             }
                             else
                             {
-                                //Dodanie podmienionego naglowka do kolejki wyjsciowej (od [0] bo to na razie lista)
-                                commutationField.BuffersOut[0].queue.Enqueue(temp);
+                                if (commutationField.BuffersOut[0].queue.Count >= commutationField.maxBuffOutSize)
+                                {
+                                    //Stary kolor konsoli
+                                    var color = Console.ForegroundColor;
 
-                                //Wyswietlenie informaji na ekranie
-                                Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" + " Package added to the OUT buffer (buffer size = " +
-                                                  commutationField.BuffersOut[0].queue.Count + ") " + Package.extractID(temp) +
-                                                  " number " + Package.extractPackageNumber(temp) + " of " + Package.extractHowManyPackages(temp));
+                                    //Ustawienie nowego koloru konsoli
+                                    Console.ForegroundColor = ConsoleColor.Cyan;
+
+                                    Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" +
+                                                      "(commutePackets) . Buffer OUT is full! Dropped package " +
+                                                      Package.extractID(msg) +
+                                                      " number " + Package.extractPackageNumber(msg) + " of " +
+                                                      Package.extractHowManyPackages(msg));
+
+                                    //Przywrocenie starego koloru konsoli
+                                    Console.ForegroundColor = color;
+                                }
+                                else
+                                {
+                                    //Dodanie podmienionego naglowka do kolejki wyjsciowej (od [0] bo to na razie lista)
+                                    commutationField.BuffersOut[0].queue.Enqueue(temp);
+
+                                    //Wyswietlenie informaji na ekranie
+                                    Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" + " Package added to the OUT buffer (buffer size = " +
+                                                      commutationField.BuffersOut[0].queue.Count + ") " + Package.extractID(temp) +
+                                                      " number " + Package.extractPackageNumber(temp) + " of " + Package.extractHowManyPackages(temp));
+
+                                }
 
                             }
-
                         }
                     }
 
-
                     //Gdy bufor wejsciowy jest pusty, to nie mozesz dalej komutowac
                     if (commutationField.bufferIn.queue.Count == 0)
-                        CanICommutePackets = false;
+                        canICommutePackets = false;
                     //W przeciwnym razie komutuj dalej!
-                    /*else
-                        CanICommutePackets = true;*/
+                    else
+                        canICommutePackets = true;
 
                     //wyswietlenie informacji na konsoli
-                    Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" +
-                                      " (commutePackets)canICommutePackets = " + CanICommutePackets);
+                    //Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" +
+                      //                " (commutePackets)canICommutePackets = " + canICommutePackets);
                 }
             }
-            
         }
 
         /// <summary>
@@ -422,23 +412,25 @@ namespace NetworkNode
             //Gdy bufory sa puste, to nie kontynuujemy
             bool canIContinue = true;
 
-           
-               
+            while (true)
+            {
+                //czekamy iles milisekund
+                canIContinue = await waitABit(100);
 
-                
+                //Console.WriteLine("sendPackage()");
 
                 if (commutationField.BuffersOut[0].queue.Count != 0)
                 {
                     //Jezeli rozmiar bufora osiagnal maksimum lub timer pozwolil na oproznienie buforow
                     if (commutationField.BuffersOut[0].queue.Count == commutationField.maxBuffOutSize
-                        || CanIClearMyBuffers)
+                        || canIClearMyBuffers)
                     {
                         //kolejka jest pusta
                         if (commutationField.BuffersOut[0].queue.Count == 0)
                         {
                             //wyswietlenie informacji na konsoli
                             Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" + " Empty OUT buffer!");
-                          
+                            break;
                         }
 
 
@@ -458,43 +450,25 @@ namespace NetworkNode
 
                             //Zdjecie z kolejki pakietu i wyslanie go
                             sS.SendingPackageBytes(send, tmp);
-/*
-                            Stopwatch sw = Stopwatch.StartNew();
-                            var wait = await Task.Run(async () =>
-                            {
-                                int miliseconds = 5;
-                                //Czekaj iles milisekund
-                                await Task.Delay(miliseconds);
-
-                                //zmiana koloru konsoli
-                                // Console.ForegroundColor = ConsoleColor.Green;
-
-                                //Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ] Timer waits " + miliseconds + "ms...");
-
-                                sw.Stop();
-                                return sw.ElapsedMilliseconds;
-                            });*/
-
-
                         }
 
                         //mozna wyzerowac licznik
                         zeroTimer = true;
 
                         //wyswietlenie informacji na konsoli
-                        Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" +
-                                          " (sendPackage)zeroTimer = " + zeroTimer);
+                        //Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" +
+                          //                " (sendPackage)zeroTimer = " + zeroTimer);
 
                         //nie mozna czyscic buforow wyjsciowych
-                        CanIClearMyBuffers = false;
+                        canIClearMyBuffers = false;
 
                         //wyswietlenie informacji na konsoli
-                        Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" +
-                                          " (sendPackage)canIClearMyBuffers = " + CanIClearMyBuffers);
+                        //Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" +
+                          //                " (sendPackage)canIClearMyBuffers = " + canIClearMyBuffers);
                     }
                 }
 
-            
+            }
         }
 
         /// <summary>
@@ -514,49 +488,49 @@ namespace NetworkNode
                     Console.ForegroundColor = ConsoleColor.Green;
 
                     sw = Stopwatch.StartNew();
-                    CanIClearMyBuffers = false;
+                    canIClearMyBuffers = false;
 
                     //wyswietlenie informacji na konsoli
-        /*            Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" +
-                                      " (timer)canIClearMyBuffers = " + canIClearMyBuffers);*/
+                    //Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" +
+                      //                " (timer)canIClearMyBuffers = " + canIClearMyBuffers);
 
                     zeroTimer = false;
 
                     //wyswietlenie informacji na konsoli
-         /*           Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" +
-                                      " (timer)zeroTimer = " + zeroTimer);*/
+                    //Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" +
+                      //                " (timer)zeroTimer = " + zeroTimer);
                 }
 
                 var wait = await Task.Run(async () =>
                 {
-                    int miliseconds = 5000;
+                    int miliseconds = 500;
                     //Czekaj iles milisekund
                     await Task.Delay(miliseconds);
 
                     //zmiana koloru konsoli
-                   // Console.ForegroundColor = ConsoleColor.Green;
+                    Console.ForegroundColor = ConsoleColor.Green;
 
-                    //Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ] Timer waits " + miliseconds + "ms...");
+                   // Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ] Timer waits " + miliseconds + "ms...");
 
                     sw.Stop();
                     return sw.ElapsedMilliseconds;
                 });
 
                 //zmiana koloru konsoli
-             //   Console.ForegroundColor = ConsoleColor.Green;
+                Console.ForegroundColor = ConsoleColor.Green;
 
                 //Gdy bufor wyjsciowy ma w sobie pakiety
                 if (commutationField.BuffersOut[0].queue.Count > 0)
-                    CanIClearMyBuffers = true;
+                    canIClearMyBuffers = true;
                 else
-                    CanIClearMyBuffers = false;
+                    canIClearMyBuffers = false;
 
                 //wyswietlenie informacji na konsoli
-           /*     Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" +
-                                  " (timer)canIClearMyBuffers = " + canIClearMyBuffers);*/
+                //Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ]" +
+                        //          " (timer)canIClearMyBuffers = " + canIClearMyBuffers);
 
                 //Przywrocenie starego koloru konsoli
-           //     Console.ForegroundColor = color;
+                Console.ForegroundColor = color;
             }
         }
 
@@ -566,9 +540,6 @@ namespace NetworkNode
             Socket socketClient = null;
             Socket listener = null;
             Socket socketSender = null;
-
-            //Uruchomienie timera
-            Task.Run(async () => await timer());
 
             //Znajac dlugosc slowa "Sending" pobieram z calej nazwy klucza tylko index, ktory wykorzystam aby dopasowac do socketu IN
             ///1-Router
@@ -597,54 +568,54 @@ namespace NetworkNode
 
             //Dodanie socketu do listy socketow OUT
             socketSendingList.Add(sS.ConnectToEndPoint(addressConnectIP));
-           
-                //oczekiwanie na polaczenie
-                socketClient = listener.Accept();
-                //dodanie do listy sluchaczy po przez delegata
-                socketListenerList.Add(socketClient);
+            //oczekiwanie na polaczenie
+            socketClient = listener.Accept();
+            //dodanie do listy sluchaczy po przez delegata
+            socketListenerList.Add(socketClient);
 
-                Listening = true;
+            Listening = true;
 
-                string tmp = string.Empty;
-                //wyznaczenie socketu przez ktory wyslana zostanie wiadomosc
-                if (numberOfRouter == "1")
+            string tmp = string.Empty;
+            //wyznaczenie socketu przez ktory wyslana zostanie wiadomosc
+            if (numberOfRouter == "1")
+            {
+                tmp = "127.0.0.12";
+
+            }
+            else if (numberOfRouter == "2")
+            {
+                tmp = "127.0.0.10";
+
+            }
+            else if (numberOfRouter == "3")
+            {
+                tmp = "127.0.0.8";
+
+            }
+
+            //Ustalenie socketa wysylajacego
+            foreach (var socket in socketSendingList)
+            {
+                //zwracamy socket jeśli host z ktorym sie laczy spelnia warunek zgodnosci adresow z wynikiem kierowania lacza
+                if (takingAddresSendingSocket(socket) == tmp)
                 {
-                    tmp = "127.0.0.12";
-
+                    //Socket wysylajacy
+                    socketSender = socket;
                 }
-                else if (numberOfRouter == "2")
-                {
-                    tmp = "127.0.0.10";
+            }
 
-                }
-                else if (numberOfRouter == "3")
-                {
-                    tmp = "127.0.0.8";
+            //Uruchomienie timera
+            Task.Run(async () =>await timer());
 
-                }
+            //Uruchomienie sluchania i wypelniania bufora
+            Task.Run(async () =>await receiveMessage(socketClient));
 
-                //Ustalenie socketa wysylajacego
-                foreach (var socket in socketSendingList)
-                {
-                    //zwracamy socket jeśli host z ktorym sie laczy spelnia warunek zgodnosci adresow z wynikiem kierowania lacza
-                    if (takingAddresSendingSocket(socket) == tmp)
-                    {
-                        //Socket wysylajacy
-                        socketSender = socket;
-                    }
-                }
+            //Uruchomione zdejmowanie z bufora wejsciowego, podmiana naglowkow, wrzucenie do bufora wyjsciowego
+            Task.Run(async () =>await commutePackets());
 
-                
+            //Uruchomione oproznianie bufora wyjsciowego (po timeoucie lub wypelnieniu bufora) i wysylanie pakietow
+            Task.Run(async () =>await sendPackage(socketSender)).Wait();
 
-                //Uruchomienie sluchania i wypelniania bufora
-                Task.Run(async () => await receiveMessage(socketClient)).Wait();
-
-                /*  //Uruchomione zdejmowanie z bufora wejsciowego, podmiana naglowkow, wrzucenie do bufora wyjsciowego
-                  Task.Run(async () =>await commutePackets());
-
-                  //Uruchomione oproznianie bufora wyjsciowego (po timeoucie lub wypelnieniu bufora) i wysylanie pakietow
-                  Task.Run(async () =>await sendPackage(socketSender)).Wait();*/
-            
         }
 
 
@@ -671,18 +642,18 @@ namespace NetworkNode
                         if (zeroTimer == true)
                         {
                             sw = Stopwatch.StartNew();
-                            CanIClearMyBuffers = false;
+                            canIClearMyBuffers = false;
                             zeroTimer = false;
                         }
 
                         var wait = await Task.Run(async () =>
                         {
-                            await Task.Delay(500);
+                            await Task.Delay(2000);
                             sw.Stop();
                             return sw.ElapsedMilliseconds;
                         });
 
-                        CanIClearMyBuffers = true;
+                        canIClearMyBuffers = true;
 
                     }
                 });
@@ -894,7 +865,7 @@ namespace NetworkNode
                 short ID = Package.extractID(bytes);
                 short messageNumber = Package.extractPackageNumber(bytes);
                 Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ] Message about ID: {0,5} and number of package {1,2} / " + Package.extractHowManyPackages(bytes) + " sent on port: " + numberOfLink, ID, messageNumber);
+                Console.WriteLine(" [ " + Timestamp.generateTimestamp() + " ] Message with ID: {0,5} and number of package {1,2} / " + Package.extractHowManyPackages(bytes) + " sent on port: " + numberOfLink, ID, messageNumber);
                 Console.ResetColor();
             }
             else

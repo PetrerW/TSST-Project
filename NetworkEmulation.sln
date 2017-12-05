@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientNode", "ClientNode\ClientNode.csproj", "{544438C2-F62E-4127-9720-61F2EBE18B25}"
 EndProject
@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkNode", "NetworkNode\NetworkNode.csproj", "{0319F67A-D211-4CAF-A147-7ED11D32D1E9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewNMS", "..\..\..\..\SEMESTR 5\TSST\NetworkEmulation\NewNMS\NewNMS.csproj", "{2329D9C8-CAE1-4492-873D-93D8591B44BE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewNMS", "NewNMS\NewNMS.csproj", "{2329D9C8-CAE1-4492-873D-93D8591B44BE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

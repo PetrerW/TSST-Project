@@ -40,7 +40,8 @@ namespace NetworkNode
             int max = q.Count();
             for (int i = 0; i < max; i++)
             {
-                tmp[i] = this.changePackageHeader(tmp[i]);
+                //TODO: nie masz referencji na border table
+                tmp[i] = this.changePackageHeader(tmp[i], null);
             }
 
             for (int i = 0; i < max; i++)
@@ -56,7 +57,7 @@ namespace NetworkNode
         /// </summary>
         /// <param name="message">Wiadomość odebrana w postaci tablicy bajtów</param>
         /// <returns></returns>
-        public byte[] changePackageHeader(byte[] message)
+        public byte[] changePackageHeader(byte[] message, BorderNodeCommutationTable borderNodeCommutationTable)
         {
             byte[] msg = new byte[64];
             msg = message;
@@ -64,19 +65,42 @@ namespace NetworkNode
 
             CommutationTableRow row = new CommutationTableRow();
             row = this.FindRow(p.frequency, p.portNumber);
-
-            p.changePort(row.port_out);
-            if (row.frequency_out == -1)
+            if (row != null)
             {
-                p.changeFrequency(row.frequency_out);
-                p.changeBand(-1);
-                p.changeModulationPerformance(-1);
-                p.changeBitRate(-1);
+                short oldPort = p.portNumber;
+
+                p.changePort(row.port_out);
+
+                //1 oznacza zawsze port kliencki
+                if (row.port_out == 1)
+                {
+                    //Idziemy do tablicy komutacji dla wezla brzegowego
+                    var row2 = borderNodeCommutationTable.FindRow(p.IP_Source.ToString(), oldPort, p.IP_Destination.ToString());
+
+                    //Zmieniamy zgodnie z ta tabela wpisy (na -1)
+                    p.changeBand(row2.band);
+                    p.changeFrequency(row2.frequency);
+                    p.changeModulationPerformance(row2.modulationPerformance);
+                    p.changeBitRate(row2.bitRate);
+                }
+
+                /*
+                if (row.frequency_out == -1)
+                {
+                    p.changeFrequency(row.frequency_out);
+                    p.changeBand(-1);
+                    p.changeModulationPerformance(-1);
+                    p.changeBitRate(-1);
+                } */
+
+                msg = p.toBytes();
+
+                return msg;
             }
-
-            msg = p.toBytes();
-
-            return msg;
+            else
+            {
+                return null;
+            }
         }
 
         /// <summary>
@@ -96,10 +120,13 @@ namespace NetworkNode
                 commutationRow = this.Table.Find(row => (row.frequency_in == frequency_in) && (row.port_in == port_in));
 
                 return commutationRow;
+
             }
             catch (Exception E)
             {
+                Console.WriteLine("Catch");
                 return commutationRow;
+              
             }
 
         }

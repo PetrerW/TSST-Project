@@ -25,7 +25,7 @@ namespace NewNMS
             {
                 byte[] buffer = new byte[128];
                 byte[] package;
-                client.ReceiveTimeout = 4000;
+               // client.ReceiveTimeout = 4000;
                 int bytesRead = client.Receive(buffer);
 
                 do

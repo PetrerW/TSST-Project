@@ -39,59 +39,67 @@
             // 
             // textBoxClientIP
             // 
-            this.textBoxClientIP.Location = new System.Drawing.Point(34, 31);
+            this.textBoxClientIP.Location = new System.Drawing.Point(45, 38);
+            this.textBoxClientIP.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.textBoxClientIP.Name = "textBoxClientIP";
-            this.textBoxClientIP.Size = new System.Drawing.Size(209, 20);
+            this.textBoxClientIP.Size = new System.Drawing.Size(277, 22);
             this.textBoxClientIP.TabIndex = 0;
+            this.textBoxClientIP.Text = "127.0.0.";
             // 
             // textBoxClientPort
             // 
-            this.textBoxClientPort.Location = new System.Drawing.Point(34, 81);
+            this.textBoxClientPort.Location = new System.Drawing.Point(45, 100);
+            this.textBoxClientPort.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.textBoxClientPort.Name = "textBoxClientPort";
-            this.textBoxClientPort.Size = new System.Drawing.Size(209, 20);
+            this.textBoxClientPort.Size = new System.Drawing.Size(277, 22);
             this.textBoxClientPort.TabIndex = 1;
             this.textBoxClientPort.Text = "11000";
             // 
             // textBoxCloudPort
             // 
-            this.textBoxCloudPort.Location = new System.Drawing.Point(34, 133);
+            this.textBoxCloudPort.Location = new System.Drawing.Point(45, 164);
+            this.textBoxCloudPort.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.textBoxCloudPort.Name = "textBoxCloudPort";
-            this.textBoxCloudPort.Size = new System.Drawing.Size(209, 20);
+            this.textBoxCloudPort.Size = new System.Drawing.Size(277, 22);
             this.textBoxCloudPort.TabIndex = 2;
             this.textBoxCloudPort.Text = "11000";
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(34, 12);
+            this.label1.Location = new System.Drawing.Point(45, 15);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(53, 13);
+            this.label1.Size = new System.Drawing.Size(69, 17);
             this.label1.TabIndex = 3;
             this.label1.Text = "Client\'s IP";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(34, 65);
+            this.label2.Location = new System.Drawing.Point(45, 80);
+            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(61, 13);
+            this.label2.Size = new System.Drawing.Size(82, 17);
             this.label2.TabIndex = 4;
             this.label2.Text = "Client\'s port";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(34, 117);
+            this.label3.Location = new System.Drawing.Point(45, 144);
+            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(62, 13);
+            this.label3.Size = new System.Drawing.Size(83, 17);
             this.label3.TabIndex = 5;
             this.label3.Text = "Cloud\'s port";
             // 
             // buttonStartClient
             // 
-            this.buttonStartClient.Location = new System.Drawing.Point(34, 173);
+            this.buttonStartClient.Location = new System.Drawing.Point(45, 213);
+            this.buttonStartClient.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.buttonStartClient.Name = "buttonStartClient";
-            this.buttonStartClient.Size = new System.Drawing.Size(209, 23);
+            this.buttonStartClient.Size = new System.Drawing.Size(279, 28);
             this.buttonStartClient.TabIndex = 6;
             this.buttonStartClient.Text = "Start client";
             this.buttonStartClient.UseVisualStyleBackColor = true;
@@ -99,10 +107,10 @@
             // 
             // StartClientApplication
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.ClientSize = new System.Drawing.Size(284, 222);
+            this.ClientSize = new System.Drawing.Size(379, 273);
             this.Controls.Add(this.buttonStartClient);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
@@ -110,6 +118,7 @@
             this.Controls.Add(this.textBoxCloudPort);
             this.Controls.Add(this.textBoxClientPort);
             this.Controls.Add(this.textBoxClientIP);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "StartClientApplication";
             this.Text = "Client";
             this.ResumeLayout(false);

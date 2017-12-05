@@ -165,7 +165,7 @@ namespace NetworkNode
                                 if (msg == null) { break; };
                                 NMSPackage package = new NMSPackage();
                                 string usableMessage = NMSPackage.extractUsableMessage(msg, NMSPackage.extractUsableInfoLength(msg));
-                                Console.WriteLine(usableMessage);
+                                //Console.WriteLine(usableMessage);
                                 fillingTable(usableMessage, agentSending, settingsString);
 
                             }

@@ -87,11 +87,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\NetworkEmulation\NetworkNode\NetworkNode.csproj">
+    <ProjectReference Include="..\NetworkNode\NetworkNode.csproj">
       <Project>{0319f67a-d211-4caf-a147-7ed11d32d1e9}</Project>
       <Name>NetworkNode</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\NetworkEmulation\NetworkingTools.cs\NetworkingTools.csproj">
+    <ProjectReference Include="..\NetworkingTools.cs\NetworkingTools.csproj">
       <Project>{bddee68b-ac6f-4863-8b9a-69952287c4f7}</Project>
       <Name>NetworkingTools</Name>
     </ProjectReference>

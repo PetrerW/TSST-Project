@@ -58,3 +58,15 @@ C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkEmulation\NetworkCa
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkEmulation\NetworkCableCloud\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkEmulation\NetworkCableCloud\bin\Debug\NetworkingTools.pdb
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkEmulation\NetworkCableCloud\obj\Debug\NetworkCableCloud.csprojResolveAssemblyReference.cache
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\NetworkCableCloud\bin\Debug\NetworkCableCloud.exe.config
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\NetworkCableCloud\bin\Debug\NetworkCableCloud.exe
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\NetworkCableCloud\bin\Debug\NetworkCableCloud.pdb
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\NetworkCableCloud\bin\Debug\NetworkingTools.exe
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\NetworkCableCloud\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\NetworkCableCloud\bin\Debug\NetworkingTools.pdb
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\NetworkCableCloud\obj\Debug\NetworkCableCloud.csprojResolveAssemblyReference.cache
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\NetworkCableCloud\obj\Debug\NetworkCableCloud.exe
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\NetworkCableCloud\obj\Debug\NetworkCableCloud.pdb
+C:\Users\Paweł\Dropbox\tsst-project\PoprawionyNMS_Pawel\NetworkCableCloud\bin\Debug\NetworkCableCloud.exe.config
+C:\Users\Paweł\Dropbox\tsst-project\PoprawionyNMS_Pawel\NetworkCableCloud\obj\Debug\NetworkCableCloud.exe
+C:\Users\Paweł\Dropbox\tsst-project\PoprawionyNMS_Pawel\NetworkCableCloud\obj\Debug\NetworkCableCloud.pdb

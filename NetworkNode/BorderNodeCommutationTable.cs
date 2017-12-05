@@ -187,7 +187,7 @@ namespace NetworkNode
             //Jak nie bylo -1, to odwolujemy sie do tabeli komutacji, ale nie brzegowej
             else
             {
-                msg = commutationField.commutationTable.changePackageHeader(msg);
+                msg = commutationField.commutationTable.changePackageHeader(msg, this);
             }
 
 

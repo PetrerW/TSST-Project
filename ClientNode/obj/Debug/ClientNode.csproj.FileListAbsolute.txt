@@ -102,3 +102,22 @@ C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkEmulation\ClientNod
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkEmulation\ClientNode\obj\Debug\ClientNode.Properties.Resources.resources
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkEmulation\ClientNode\obj\Debug\ClientNode.StartClientApplication.resources
 C:\Users\Daniel\Documents\Visual Studio 2015\Projects\NetworkEmulation\ClientNode\obj\Debug\ClientNode.csproj.GenerateResource.Cache
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\ClientNode\bin\Debug\ClientNode.exe.config
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\ClientNode\obj\Debug\ClientNode.exe
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\ClientNode\obj\Debug\ClientNode.pdb
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\ClientNode\bin\Debug\ClientNode.exe
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\ClientNode\bin\Debug\ClientNode.pdb
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\ClientNode\bin\Debug\NetworkingTools.exe
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\ClientNode\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\ClientNode\bin\Debug\NetworkingTools.pdb
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\ClientNode\obj\Debug\ClientNode.csprojResolveAssemblyReference.cache
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\ClientNode\obj\Debug\ClientNode.ClientApplication.resources
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\ClientNode\obj\Debug\ClientNode.Properties.Resources.resources
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\ClientNode\obj\Debug\ClientNode.StartClientApplication.resources
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\ClientNode\obj\Debug\ClientNode.csproj.GenerateResource.Cache
+C:\Users\Paweł\Dropbox\tsst-project\PoprawionyNMS_Pawel\ClientNode\bin\Debug\ClientNode.exe.config
+C:\Users\Paweł\Dropbox\tsst-project\PoprawionyNMS_Pawel\ClientNode\obj\Debug\ClientNode.exe
+C:\Users\Paweł\Dropbox\tsst-project\PoprawionyNMS_Pawel\ClientNode\obj\Debug\ClientNode.pdb
+C:\Users\Daniel\Dropbox\tsst-project\PoprawionyNMS_Pawel\ClientNode\bin\Debug\ClientNode.exe.config
+C:\Users\Daniel\Dropbox\tsst-project\PoprawionyNMS_Pawel\ClientNode\obj\Debug\ClientNode.exe
+C:\Users\Daniel\Dropbox\tsst-project\PoprawionyNMS_Pawel\ClientNode\obj\Debug\ClientNode.pdb

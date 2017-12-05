@@ -164,25 +164,21 @@ namespace ClientNode
                                 List<byte[]> packages = new List<byte[]>();
                                 //Zamienienie odebranej wiadomości na tablicę bajtów
                                 messagebytes = sl.ProcessRecivedBytes(socket);
-                                if (messagebytes != null)
-                                {
-                                    string timestamp2 = Timestamp.generateTimestamp();
-                                    numberOfPackages++;
-                                    frameID = Package.extractID(messagebytes);
-                                    //Odpakowanie adresy nadawcy z otrzymanej wiadomości
-                                    sourceIp = Package.exctractSourceIP(messagebytes).ToString();
-                                    //Stworzenie wiadomości, która zostanie wyświetlona na ekranie - odpakowanie treści wiadomości z paczki
-                                    message2 = sourceIp + ": " + Package.extractUsableMessage(messagebytes, Package.extractUsableInfoLength(messagebytes)) + " with FrameID=" + frameID;
-                                    //Pojawienie się informacji o otrzymaniu wiadomości
-                                    _ClientApplication.updateLogTextBox("[" + timestamp2 + "] == RECEIVED MESSAGE number " + numberOfPackages + " == S_ClientIP: " + sourceIp);
-                                    //Zauktualizowanie wiadomości w polu ReceivedMessage
-                                    _ClientApplication.updateReceivedMessageTextBox(message2);
-                                    _ClientApplication.updateReceivedMessageTextBox("\r\n");
-                                    message2 = null;
-                                    messagebytes = null;
-                                    frameID = 0;
-                                }
-
+                                string timestamp2 = Timestamp.generateTimestamp();
+                                numberOfPackages++;
+                                frameID = Package.extractID(messagebytes);
+                                //Odpakowanie adresy nadawcy z otrzymanej wiadomości
+                                sourceIp = Package.exctractSourceIP(messagebytes).ToString();
+                                //Stworzenie wiadomości, która zostanie wyświetlona na ekranie - odpakowanie treści wiadomości z paczki
+                                message2 = sourceIp + ": " + Package.extractUsableMessage(messagebytes, Package.extractUsableInfoLength(messagebytes));
+                                //Pojawienie się informacji o otrzymaniu wiadomości
+                                _ClientApplication.updateLogTextBox("[" + timestamp2 + "] == RECEIVED MESSAGE number " + numberOfPackages + " == S_ClientIP: " + sourceIp + " with FrameID=" + frameID);
+                                //Zauktualizowanie wiadomości w polu ReceivedMessage
+                                _ClientApplication.updateReceivedMessageTextBox(message2);
+                                _ClientApplication.updateReceivedMessageTextBox("\r\n");
+                                message2 = null;
+                                messagebytes = null;
+                                frameID = 0;
                                 /*
                                 if (howManyPackages >= 2)
                                 {
@@ -276,32 +272,33 @@ namespace ClientNode
             buttonStopSendingClicked = false;
             // if (buttonSendRandomClicked == false)
             //  {
-            t = Task.Run( () =>
+            t = Task.Run(async () =>
             {
                 //  while (buttonStopSendingClicked != true)
                 //  {
-                short frameID = (short)(new Random()).Next(0, short.MaxValue);
+                
                 string message = null;
                 //Wygnenerowanie losowej wiadomości o maksymalnej długości
-
+                short frameID;
                 int nbOfMessages = Int32.Parse(textBoxHowManyMessages.Text);
                 byte[] bytemessage;
-                
-                for (int i=0; i<nbOfMessages;i++ )
+                for (int i = 0; i < nbOfMessages; i++)
                 {
-                  /*  message = RandomMessageGenerator.generateRandomMessage(10);
-                    //Pobranie wiadomości                        
-                    short messageLength = (short)message.Length;*/
+                    //message = RandomMessageGenerator.generateRandomMessage(37);
+                    //Pobranie wiadomości                   
+                    message = "123";     
+                    short messageLength = (short)message.Length;
                     //Stworzenie wysyłanej paczki
                     bytemessage = null;
-                    EONpackage = new Package("123", 1, destination, _ClientApplication.ClientIP, 3,(short) i, (short)(-1),
+                    frameID = (short)(new Random()).Next(0, short.MaxValue);
+                    EONpackage = new Package(message, 1, destination, _ClientApplication.ClientIP, messageLength, Convert.ToInt16(1), (short)(-1),
                                 (short)(-1), (short)(-1), (short)(-1), frameID, 1);
                     bytemessage = EONpackage.toBytes();
                     //Stworzenie znacznika czasowego
                     string timestamp = Timestamp.generateTimestamp();
                     //Zamiana paczki na tablicę bajtów
 
-                   if (send.Connected)
+                    if (send.Connected)
                     {
                         //Wysłanie wiadomości (tablicy bajtów) za pośrednictwem gniazda
                         sS.SendingPackageBytes(send, bytemessage);
@@ -309,22 +306,14 @@ namespace ClientNode
                         _ClientApplication.updateLogTextBox("[" + timestamp + "] == SENDING MESSAGE number " + (i + 1) + "==  D_ClientIP " + destination);
                     }
 
-                    /*var wait = await Task.Run(async () =>
+                    var wait = await Task.Run(async () =>
                             {
                                 Stopwatch sw = Stopwatch.StartNew();
-                                await Task.Delay(50);
+                                await Task.Delay(20);
                                 sw.Stop();
                                 return sw.ElapsedMilliseconds;
-                            });*/
-                    var t = Task.Run(async delegate
-                    {
-                        await Task.Delay(50);
-                        return 42;
-                    });
-                    t.Wait();
-                                   
-
-            }
+                            });
+                }
                 /*if (messageLength > Package.usableInfoMaxLength)
                 {
                     double numberOfPackages = (Math.Ceiling((double)messageLength / Package.usableInfoMaxLength));

@@ -44,14 +44,14 @@ E:\SEMESTR 5\TSST\NetworkEmulation\Test\bin\Debug\NetworkingTools.pdb
 E:\SEMESTR 5\TSST\NetworkEmulation\Test\obj\Debug\Test.csprojResolveAssemblyReference.cache
 E:\SEMESTR 5\TSST\NetworkEmulation\Test\obj\Debug\Test.exe
 E:\SEMESTR 5\TSST\NetworkEmulation\Test\obj\Debug\Test.pdb
-E:\Users\Paweł\Desktop\NetworkEmulation\Test\bin\Debug\Test.exe.config
-E:\Users\Paweł\Desktop\NetworkEmulation\Test\bin\Debug\Test.exe
-E:\Users\Paweł\Desktop\NetworkEmulation\Test\bin\Debug\Test.pdb
-E:\Users\Paweł\Desktop\NetworkEmulation\Test\bin\Debug\ClientNode.exe
-E:\Users\Paweł\Desktop\NetworkEmulation\Test\bin\Debug\NetworkingTools.exe
-E:\Users\Paweł\Desktop\NetworkEmulation\Test\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
-E:\Users\Paweł\Desktop\NetworkEmulation\Test\bin\Debug\ClientNode.pdb
-E:\Users\Paweł\Desktop\NetworkEmulation\Test\bin\Debug\NetworkingTools.pdb
-E:\Users\Paweł\Desktop\NetworkEmulation\Test\obj\Debug\Test.csprojResolveAssemblyReference.cache
-E:\Users\Paweł\Desktop\NetworkEmulation\Test\obj\Debug\Test.exe
-E:\Users\Paweł\Desktop\NetworkEmulation\Test\obj\Debug\Test.pdb
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\Test\bin\Debug\Test.exe.config
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\Test\obj\Debug\Test.exe
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\Test\obj\Debug\Test.pdb
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\Test\bin\Debug\Test.exe
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\Test\bin\Debug\Test.pdb
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\Test\bin\Debug\ClientNode.exe
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\Test\bin\Debug\NetworkingTools.exe
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\Test\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\Test\bin\Debug\ClientNode.pdb
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\Test\bin\Debug\NetworkingTools.pdb
+E:\Dropbox\Piotrka\Przedmioty\Sem5\TSST\tsst-project\PoprawionyNMS_Pawel\Test\obj\Debug\Test.csprojResolveAssemblyReference.cache
