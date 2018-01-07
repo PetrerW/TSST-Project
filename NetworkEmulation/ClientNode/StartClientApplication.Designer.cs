@@ -1,4 +1,6 @@
-﻿namespace ClientNode
+﻿using System.Windows.Forms;
+
+namespace ClientNode
 {
     partial class StartClientApplication
     {
@@ -43,6 +45,8 @@
             this.textBoxClientIP.Name = "textBoxClientIP";
             this.textBoxClientIP.Size = new System.Drawing.Size(209, 20);
             this.textBoxClientIP.TabIndex = 0;
+            this.textBoxClientIP.Text = "127.0.0.";
+            this.textBoxClientIP.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBoxClientIP_KeyDown);
             // 
             // textBoxClientPort
             // 
