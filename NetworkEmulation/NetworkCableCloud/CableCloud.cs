@@ -300,7 +300,7 @@ namespace NetworkCalbleCloud
                             // listByte.Add(msg);
 
                             //Wykonuje jezeli nadal zestawione jest polaczenie
-                            if (socketClient.Connected && msg!=null)
+                            if (socketClient.Connected)
                             {
                                 stateReceivedMessage(msg, socketClient);
                                 //Uzyskanie czestotliwosci zawartej w naglowku- potrzebna do okreslenia ktorym laczem idzie wiadomosc
