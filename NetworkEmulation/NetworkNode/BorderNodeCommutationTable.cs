@@ -147,7 +147,7 @@ namespace NetworkNode
 
             return msg;
         }
-
+        
         /// <summary>
         /// Funkcja słuząca do zamiany nagłówka, uwzgledniajaca "-1" w czestotliwosci
         /// </summary>

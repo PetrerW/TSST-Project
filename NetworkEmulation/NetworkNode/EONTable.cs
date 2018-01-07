@@ -69,6 +69,22 @@ namespace NetworkNode
         }
 
         /// <summary>
+        /// Znajduje wolna czestotliwosc. Jezeli zadnej nie znajdzie, zwroci -1.
+        /// </summary>
+        /// <param name="band"></param>
+        /// <param name="in_or_out"></param>
+        /// <returns></returns>
+        public short FindFreeFrequency(short band, string in_or_out)
+        {
+            for (short i = 0; i <= EONTable.capacity - band; i++)
+            {
+                if (CheckAvailability(i, band, in_or_out))
+                    return i;
+            }
+            return -1;
+        }
+
+        /// <summary>
         /// Sprawdza, czy pasmo na zadanej częstotliwości jest wolne w tym routerze. in_or_out ma wartości "in" lub "out
         /// </summary>
         /// <param name="frequency"></param>
@@ -102,8 +118,6 @@ namespace NetworkNode
             {
                 Console.WriteLine(E.Message);
             }
-
-
             return flag;
         }
 
@@ -133,22 +147,29 @@ namespace NetworkNode
         /// <param name="row"></param>
         public bool addRow(EONTableRowIN row)
         {
-            //sprawdzenie, czy wpis nie bedzie kolidowal
-            if (CheckAvailability(row.busyFrequency, row.busyBandIN, "in"))
+            try
             {
-                //dodanie do tabeli
-                this.TableIN.Add(row);
+                //sprawdzenie, czy wpis nie bedzie kolidowal
+                if (CheckAvailability(row.busyFrequency, row.busyBandIN, "in"))
+                {
+                    //dodanie do tabeli
+                    this.TableIN.Add(row);
 
-                //Ustawienie wartosci zajetych pol w tabeli
-                for (int i = row.busyFrequency; i < row.busyFrequency + row.busyBandIN; i++)
-                    this.InFrequencies[i] = row.busyFrequency;
+                    //Ustawienie wartosci zajetych pol w tabeli
+                    for (int i = row.busyFrequency; i < row.busyFrequency + row.busyBandIN; i++)
+                        this.InFrequencies[i] = row.busyFrequency;
 
-                return true;
+                    return true;
+                }
+                else
+                    throw new Exception("EONTable.addRow(in): failed to add a row!");
             }
-            else
-                throw new Exception("EONTable.addRow(in): failed to add a row!");
+            catch (Exception E)
+            {
+                Console.WriteLine(E.Message);
+                return false;
+            }
 
-            return false;
         }
 
         /// <summary>
@@ -157,22 +178,28 @@ namespace NetworkNode
         /// <param name="row"></param>
         public bool addRow(EONTableRowOut row)
         {
-            //sprawdzenie, czy wpis nie bedzie kolidowal
-            if (CheckAvailability(row.busyFrequency, row.busyBandOUT, "out"))
+            try
             {
-                //dodanie do tabeli
-                this.TableOut.Add(row);
+                //sprawdzenie, czy wpis nie bedzie kolidowal
+                if (CheckAvailability(row.busyFrequency, row.busyBandOUT, "out"))
+                {
+                    //dodanie do tabeli
+                    this.TableOut.Add(row);
 
-                //Ustawienie wartosci zajetych pol w tabeli
-                for (int i = row.busyFrequency; i < row.busyFrequency + row.busyBandOUT; i++)
-                    this.OutFrequencies[i] = row.busyFrequency;
+                    //Ustawienie wartosci zajetych pol w tabeli
+                    for (int i = row.busyFrequency; i < row.busyFrequency + row.busyBandOUT; i++)
+                        this.OutFrequencies[i] = row.busyFrequency;
 
-                return true;
+                    return true;
+                }
+                else
+                    throw new Exception("EONTable.addRow(in): failed to add a row!");
             }
-            else
-                throw new Exception("EONTable.addRow(in): failed to add a row!");
-
-            return false;
+            catch (Exception E)
+            {
+                Console.WriteLine(E.Message);
+                return false;
+            }
         }
 
         /// <summary>
@@ -186,7 +213,7 @@ namespace NetworkNode
             if (TableIN.Contains(row))
             {
                 //zwolnienie wszystkich szczelin zwiazanych z danym wierszem
-                for (int i = row.busyFrequency; i < row.busyBandIN+row.busyFrequency; i++)
+                for (int i = row.busyFrequency; i < row.busyBandIN + row.busyFrequency; i++)
                 {
                     InFrequencies[i] = -1;
                 }
